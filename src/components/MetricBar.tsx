@@ -28,7 +28,7 @@ const MetricBar = ({ title, value, ideal, score, color, delay = 0 }: MetricBarPr
 
   return (
     <div
-      className={`bg-card border border-border/50 rounded-lg p-4 space-y-3 transition-all duration-500 hover:border-${color}/30 ${
+      className={`bg-card border border-border/50 rounded-lg p-4 space-y-3 transition-all duration-500 hover:border-${color}/30 hover:glow-subtle cursor-pointer ${
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
       }`}
     >

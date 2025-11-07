@@ -31,6 +31,7 @@ const Index = () => {
       {stage === "analysis" && (
         <AnalysisPanel
           profileImage={profileImage}
+          frontImage={frontImage}
         />
       )}
     </div>

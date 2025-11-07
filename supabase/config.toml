@@ -1,0 +1,4 @@
+project_id = "ioqmmqyvfhdpldkchris"
+
+[functions.facial-advice]
+verify_jwt = false
