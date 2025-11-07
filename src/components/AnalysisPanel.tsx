@@ -254,7 +254,8 @@ const AnalysisPanel = ({
     }}>
         <div>
           <h4 className="text-2xl font-bold tracking-wider my-0 text-center">LOVE // AI FACIAL ENGINE 
-SO YOU CAN FEEL YOUR BEST AND BE THE BEST</h4>
+SO YOU CAN 
+FEEL YOUR BEST AND BE THE BEST</h4>
           <p className="text-muted-foreground text-sm mt-2">
             Built to reveal what makes you unforgettable.
           </p>
