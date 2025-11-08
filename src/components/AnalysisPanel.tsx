@@ -267,7 +267,7 @@ const AnalysisPanel = ({
               
               {/* Profile Image */}
               {profileImage && <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-cyan/30 glow-subtle">
-                  <img src={profileImage} alt="Profile analysis" className="w-full h-full object-cover" />
+                  <img src={profileImage} alt="Profile analysis" className="w-full h-full object-contain" />
                 </div>}
             </div>
           </div>
