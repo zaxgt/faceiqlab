@@ -218,22 +218,31 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
         );
 
       case "noseToMouthRatio":
+        // Show nose base to upper lip distance vs nose to nose base distance
         return (
           <>
+            {/* Nose height (top to base) */}
             <line 
               x1={`${imageLandmarks.noseTop.x * 100}%`}
               y1={`${imageLandmarks.noseTop.y * 100}%`}
-              x2={`${imageLandmarks.noseTip.x * 100}%`}
-              y2={`${imageLandmarks.noseTip.y * 100}%`}
-              stroke="hsl(var(--cyan))" strokeWidth="2"
+              x2={`${imageLandmarks.noseBottom.x * 100}%`}
+              y2={`${imageLandmarks.noseBottom.y * 100}%`}
+              stroke="#00D4FF" 
+              strokeWidth="3"
             />
+            {/* Nose to mouth distance */}
             <line 
-              x1={`${imageLandmarks.noseTip.x * 100}%`}
-              y1={`${imageLandmarks.noseTip.y * 100}%`}
+              x1={`${imageLandmarks.noseBottom.x * 100}%`}
+              y1={`${imageLandmarks.noseBottom.y * 100}%`}
               x2={`${imageLandmarks.lipTop.x * 100}%`}
               y2={`${imageLandmarks.lipTop.y * 100}%`}
-              stroke="hsl(var(--magenta))" strokeWidth="2"
+              stroke="#FF00D4" 
+              strokeWidth="3"
             />
+            {/* Markers */}
+            <circle cx={`${imageLandmarks.noseTop.x * 100}%`} cy={`${imageLandmarks.noseTop.y * 100}%`} r="4" fill="#00D4FF"/>
+            <circle cx={`${imageLandmarks.noseBottom.x * 100}%`} cy={`${imageLandmarks.noseBottom.y * 100}%`} r="4" fill="#FFFFFF"/>
+            <circle cx={`${imageLandmarks.lipTop.x * 100}%`} cy={`${imageLandmarks.lipTop.y * 100}%`} r="4" fill="#FF00D4"/>
           </>
         );
 
@@ -402,26 +411,168 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
         );
 
       case "nasalProjection":
-      case "nasalTipAngle":
-      case "nasofrontalAngle":
-      case "nasolabialAngle":
+        // Show projection distance from face plane to nose tip
         return (
           <>
+            {/* Face plane reference line */}
+            <line 
+              x1={`${(imageLandmarks.forehead?.x || 0.3) * 100}%`}
+              y1={`${(imageLandmarks.forehead?.y || 0.2) * 100}%`}
+              x2={`${(imageLandmarks.chin?.x || 0.3) * 100}%`}
+              y2={`${(imageLandmarks.chin?.y || 0.8) * 100}%`}
+              stroke="#808080" 
+              strokeWidth="2"
+              strokeDasharray="5,5"
+            />
+            {/* Projection line from face plane to nose tip */}
+            <line 
+              x1={`${(imageLandmarks.forehead?.x || 0.3) * 100}%`}
+              y1={`${imageLandmarks.noseTip.y * 100}%`}
+              x2={`${imageLandmarks.noseTip.x * 100}%`}
+              y2={`${imageLandmarks.noseTip.y * 100}%`}
+              stroke="#00D4FF" 
+              strokeWidth="3"
+            />
+            <circle cx={`${imageLandmarks.noseTip.x * 100}%`} cy={`${imageLandmarks.noseTip.y * 100}%`} r="5" fill="#00D4FF"/>
+            <text
+              x={`${((imageLandmarks.forehead?.x || 0.3) + imageLandmarks.noseTip.x) / 2 * 100}%`}
+              y={`${(imageLandmarks.noseTip.y - 0.03) * 100}%`}
+              fill="#00D4FF"
+              fontSize="14"
+              fontWeight="bold"
+              textAnchor="middle"
+            >
+              {metric.value}
+            </text>
+          </>
+        );
+
+      case "nasalTipAngle":
+        // Show the angle at the tip of the nose
+        return (
+          <>
+            {/* Line from nose bridge to tip */}
             <line 
               x1={`${imageLandmarks.noseTop.x * 100}%`}
               y1={`${imageLandmarks.noseTop.y * 100}%`}
               x2={`${imageLandmarks.noseTip.x * 100}%`}
               y2={`${imageLandmarks.noseTip.y * 100}%`}
-              stroke="hsl(var(--cyan))" strokeWidth="2"
+              stroke="#00D4FF" 
+              strokeWidth="3"
             />
+            {/* Line from tip to columella/base */}
             <line 
               x1={`${imageLandmarks.noseTip.x * 100}%`}
               y1={`${imageLandmarks.noseTip.y * 100}%`}
+              x2={`${(imageLandmarks.noseTip.x - 0.05) * 100}%`}
+              y2={`${(imageLandmarks.noseTip.y + 0.05) * 100}%`}
+              stroke="#FF00D4" 
+              strokeWidth="3"
+            />
+            {/* Angle arc */}
+            <path
+              d={`M ${imageLandmarks.noseTip.x * 100 + 3} ${imageLandmarks.noseTip.y * 100} 
+                  A 15 15 0 0 1 ${imageLandmarks.noseTip.x * 100 - 3} ${imageLandmarks.noseTip.y * 100 + 3}`}
+              fill="none"
+              stroke="#FFFF00"
+              strokeWidth="2"
+            />
+            <circle cx={`${imageLandmarks.noseTip.x * 100}%`} cy={`${imageLandmarks.noseTip.y * 100}%`} r="5" fill="#FFFFFF"/>
+            <text
+              x={`${(imageLandmarks.noseTip.x + 0.05) * 100}%`}
+              y={`${imageLandmarks.noseTip.y * 100}%`}
+              fill="#FFFF00"
+              fontSize="16"
+              fontWeight="bold"
+            >
+              {metric.value}
+            </text>
+          </>
+        );
+
+      case "nasofrontalAngle":
+        // Show the angle where nose meets forehead
+        return (
+          <>
+            {/* Forehead to nose bridge line */}
+            <line 
+              x1={`${(imageLandmarks.forehead?.x || imageLandmarks.noseTop.x - 0.02) * 100}%`}
+              y1={`${(imageLandmarks.forehead?.y || imageLandmarks.noseTop.y - 0.1) * 100}%`}
+              x2={`${imageLandmarks.noseTop.x * 100}%`}
+              y2={`${imageLandmarks.noseTop.y * 100}%`}
+              stroke="#00D4FF" 
+              strokeWidth="3"
+            />
+            {/* Nose bridge to tip line */}
+            <line 
+              x1={`${imageLandmarks.noseTop.x * 100}%`}
+              y1={`${imageLandmarks.noseTop.y * 100}%`}
+              x2={`${imageLandmarks.noseTip.x * 100}%`}
+              y2={`${imageLandmarks.noseTip.y * 100}%`}
+              stroke="#FF00D4" 
+              strokeWidth="3"
+            />
+            {/* Angle arc at nose bridge */}
+            <path
+              d={`M ${imageLandmarks.noseTop.x * 100 - 2} ${imageLandmarks.noseTop.y * 100 - 3} 
+                  A 20 20 0 0 1 ${imageLandmarks.noseTop.x * 100 + 2} ${imageLandmarks.noseTop.y * 100 + 3}`}
+              fill="none"
+              stroke="#FFFF00"
+              strokeWidth="2"
+            />
+            <circle cx={`${imageLandmarks.noseTop.x * 100}%`} cy={`${imageLandmarks.noseTop.y * 100}%`} r="5" fill="#FFFFFF"/>
+            <text
+              x={`${(imageLandmarks.noseTop.x - 0.05) * 100}%`}
+              y={`${(imageLandmarks.noseTop.y + 0.05) * 100}%`}
+              fill="#FFFF00"
+              fontSize="16"
+              fontWeight="bold"
+            >
+              {metric.value}
+            </text>
+          </>
+        );
+
+      case "nasolabialAngle":
+        // Show the angle between nose base and upper lip
+        return (
+          <>
+            {/* Line from nose tip down to columella */}
+            <line 
+              x1={`${imageLandmarks.noseTip.x * 100}%`}
+              y1={`${imageLandmarks.noseTip.y * 100}%`}
+              x2={`${(imageLandmarks.noseTip.x - 0.04) * 100}%`}
+              y2={`${(imageLandmarks.noseTip.y + 0.04) * 100}%`}
+              stroke="#00D4FF" 
+              strokeWidth="3"
+            />
+            {/* Line from columella to upper lip */}
+            <line 
+              x1={`${(imageLandmarks.noseTip.x - 0.04) * 100}%`}
+              y1={`${(imageLandmarks.noseTip.y + 0.04) * 100}%`}
               x2={`${imageLandmarks.lipTop.x * 100}%`}
               y2={`${imageLandmarks.lipTop.y * 100}%`}
-              stroke="hsl(var(--magenta))" strokeWidth="2"
+              stroke="#FF00D4" 
+              strokeWidth="3"
             />
-            <circle cx={`${imageLandmarks.noseTip.x * 100}%`} cy={`${imageLandmarks.noseTip.y * 100}%`} r="4" fill="hsl(var(--cyan))"/>
+            {/* Angle arc */}
+            <path
+              d={`M ${(imageLandmarks.noseTip.x - 0.04) * 100 + 2} ${(imageLandmarks.noseTip.y + 0.04) * 100 - 2} 
+                  A 15 15 0 0 1 ${(imageLandmarks.noseTip.x - 0.04) * 100 - 2} ${(imageLandmarks.noseTip.y + 0.04) * 100 + 2}`}
+              fill="none"
+              stroke="#FFFF00"
+              strokeWidth="2"
+            />
+            <circle cx={`${(imageLandmarks.noseTip.x - 0.04) * 100}%`} cy={`${(imageLandmarks.noseTip.y + 0.04) * 100}%`} r="5" fill="#FFFFFF"/>
+            <text
+              x={`${(imageLandmarks.noseTip.x - 0.08) * 100}%`}
+              y={`${(imageLandmarks.noseTip.y + 0.04) * 100}%`}
+              fill="#FFFF00"
+              fontSize="16"
+              fontWeight="bold"
+            >
+              {metric.value}
+            </text>
           </>
         );
 
