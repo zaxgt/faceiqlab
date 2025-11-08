@@ -2,3 +2,6 @@ project_id = "ioqmmqyvfhdpldkchris"
 
 [functions.facial-advice]
 verify_jwt = false
+
+[functions.analyze-face]
+verify_jwt = false

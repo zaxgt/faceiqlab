@@ -2,128 +2,188 @@ import MetricBar from "@/components/MetricBar";
 import MetricDialog from "@/components/MetricDialog";
 import { Star, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 interface AnalysisPanelProps {
   profileImage: string | null;
   frontImage: string | null;
 }
-const metrics = [{
-  title: "Midface Ratio",
-  value: "0.98",
-  ideal: "0.95-1.00",
-  score: 7.8,
-  color: "cyan",
-  description: "The midface ratio measures the vertical proportion of your middle face. A ratio closer to the golden proportion creates balanced facial harmony."
-}, {
-  title: "Gonial Angle",
-  value: "118.0°",
-  ideal: "120-130°",
-  score: 7.2,
-  color: "cyan",
-  description: "The gonial angle defines your jawline sharpness. Angles within 120-130° create the most defined, masculine jaw structure."
-}, {
-  title: "Nose-to-Mouth Ratio",
-  value: "1.05",
-  ideal: "1.20-1.30",
-  score: 6.5,
-  color: "cyan",
-  description: "This ratio measures the balance between your nose length and upper lip distance. Higher ratios indicate better facial proportionality."
-}, {
-  title: "Eye-to-Eye Separation",
-  value: "0.92",
-  ideal: "0.88-0.95",
-  score: 9.5,
-  color: "cyan",
-  description: "Interocular spacing affects perceived facial balance. Your measurement falls within the ideal range for harmonious eye placement."
-}, {
-  title: "Cantal Tilt",
-  value: "4.2°",
-  ideal: "5-8°",
-  score: 7.0,
-  color: "magenta",
-  description: "Cantal tilt is the angle of your outer eye corners. A positive tilt of 5-8° creates the most attractive, youthful eye shape."
-}, {
-  title: "Eyebrow Tilt",
-  value: "3.8°",
-  ideal: "2-5°",
-  score: 9.6,
-  color: "magenta",
-  description: "Eyebrow angle defines facial expression and frame. Your tilt is well-positioned within the ideal expressive range."
-}, {
-  title: "Yaw Symmetry",
-  value: "98.2%",
-  ideal: "95-100%",
-  score: 9.8,
-  color: "cyan",
-  description: "Yaw symmetry measures how centered and balanced your face appears. Higher percentages indicate exceptional facial alignment."
-}, {
-  title: "Nasal Projection",
-  value: "14.2mm",
-  ideal: "12-16mm",
-  score: 9.3,
-  color: "cyan",
-  description: "Nasal projection measures how far your nose extends from your face. Your measurement shows excellent dimensional balance."
-}, {
-  title: "Nasal Tip Angle",
-  value: "127.9°",
-  ideal: "95-115°",
-  score: 5.8,
-  color: "magenta",
-  description: "The nasal tip angle affects the overall nose profile. Angles within 95-115° are considered most aesthetically refined."
-}, {
-  title: "Nasofrontal Angle",
-  value: "117.1°",
-  ideal: "115-135°",
-  score: 10.0,
-  color: "cyan",
-  description: "This angle measures the transition from forehead to nose bridge. Your measurement indicates perfect upper face harmony."
-}, {
-  title: "Nasolabial Angle",
-  value: "102.5°",
-  ideal: "90-120°",
-  score: 9.5,
-  color: "magenta",
-  description: "The nasolabial angle defines the curvature between nose and upper lip. Your angle creates excellent facial flow."
-}, {
-  title: "Facial Convexity (Glabella)",
-  value: "168.4°",
-  ideal: "165-175°",
-  score: 9.6,
-  color: "cyan",
-  description: "Measures the forehead-to-midface curvature. Your measurement shows strong forward projection and balanced profile."
-}, {
-  title: "Facial Convexity (Nasion)",
-  value: "166.2°",
-  ideal: "160-170°",
-  score: 9.7,
-  color: "magenta",
-  description: "This measures midface-to-nose harmony. Your convexity indicates excellent proportional smoothness."
-}, {
-  title: "Total Facial Convexity",
-  value: "167.8°",
-  ideal: "165-175°",
-  score: 9.7,
-  color: "cyan",
-  description: "Overall facial profile curvature. Your measurement demonstrates strong dimensional proportionality."
-}, {
-  title: "Nasal Height-to-Width Ratio",
-  value: "1.12",
-  ideal: "1.00-1.20",
-  score: 9.4,
-  color: "magenta",
-  description: "Defines nose balance from front view. Your ratio shows well-proportioned nasal dimensions."
-}];
+
+const metricDefinitions = [
+  {
+    key: "midfaceRatio",
+    title: "Midface Ratio",
+    ideal: "0.95-1.00",
+    color: "cyan",
+    description: "The midface ratio measures the vertical proportion of your middle face. A ratio closer to the golden proportion creates balanced facial harmony."
+  },
+  {
+    key: "gonialAngle",
+    title: "Gonial Angle",
+    ideal: "120-130°",
+    color: "cyan",
+    description: "The gonial angle defines your jawline sharpness. Angles within 120-130° create the most defined, masculine jaw structure."
+  },
+  {
+    key: "noseToMouthRatio",
+    title: "Nose-to-Mouth Ratio",
+    ideal: "1.20-1.30",
+    color: "cyan",
+    description: "This ratio measures the balance between your nose length and upper lip distance. Higher ratios indicate better facial proportionality."
+  },
+  {
+    key: "eyeToEyeSeparation",
+    title: "Eye-to-Eye Separation",
+    ideal: "0.88-0.95",
+    color: "cyan",
+    description: "Interocular spacing affects perceived facial balance. Your measurement falls within the ideal range for harmonious eye placement."
+  },
+  {
+    key: "cantalTilt",
+    title: "Cantal Tilt",
+    ideal: "5-8°",
+    color: "magenta",
+    description: "Cantal tilt is the angle of your outer eye corners. A positive tilt of 5-8° creates the most attractive, youthful eye shape."
+  },
+  {
+    key: "eyebrowTilt",
+    title: "Eyebrow Tilt",
+    ideal: "2-5°",
+    color: "magenta",
+    description: "Eyebrow angle defines facial expression and frame. Your tilt is well-positioned within the ideal expressive range."
+  },
+  {
+    key: "yawSymmetry",
+    title: "Yaw Symmetry",
+    ideal: "95-100%",
+    color: "cyan",
+    description: "Yaw symmetry measures how centered and balanced your face appears. Higher percentages indicate exceptional facial alignment."
+  },
+  {
+    key: "nasalProjection",
+    title: "Nasal Projection",
+    ideal: "12-16mm",
+    color: "cyan",
+    description: "Nasal projection measures how far your nose extends from your face. Your measurement shows excellent dimensional balance."
+  },
+  {
+    key: "nasalTipAngle",
+    title: "Nasal Tip Angle",
+    ideal: "95-115°",
+    color: "magenta",
+    description: "The nasal tip angle affects the overall nose profile. Angles within 95-115° are considered most aesthetically refined."
+  },
+  {
+    key: "nasofrontalAngle",
+    title: "Nasofrontal Angle",
+    ideal: "115-135°",
+    color: "cyan",
+    description: "This angle measures the transition from forehead to nose bridge. Your measurement indicates perfect upper face harmony."
+  },
+  {
+    key: "nasolabialAngle",
+    title: "Nasolabial Angle",
+    ideal: "90-120°",
+    color: "magenta",
+    description: "The nasolabial angle defines the curvature between nose and upper lip. Your angle creates excellent facial flow."
+  },
+  {
+    key: "facialConvexityGlabella",
+    title: "Facial Convexity (Glabella)",
+    ideal: "165-175°",
+    color: "cyan",
+    description: "Measures the forehead-to-midface curvature. Your measurement shows strong forward projection and balanced profile."
+  },
+  {
+    key: "facialConvexityNasion",
+    title: "Facial Convexity (Nasion)",
+    ideal: "160-170°",
+    color: "magenta",
+    description: "This measures midface-to-nose harmony. Your convexity indicates excellent proportional smoothness."
+  },
+  {
+    key: "totalFacialConvexity",
+    title: "Total Facial Convexity",
+    ideal: "165-175°",
+    color: "cyan",
+    description: "Overall facial profile curvature. Your measurement demonstrates strong dimensional proportionality."
+  },
+  {
+    key: "nasalHeightToWidthRatio",
+    title: "Nasal Height-to-Width Ratio",
+    ideal: "1.00-1.20",
+    color: "magenta",
+    description: "Defines nose balance from front view. Your ratio shows well-proportioned nasal dimensions."
+  }
+];
 const AnalysisPanel = ({
   profileImage,
   frontImage
 }: AnalysisPanelProps) => {
-  const [selectedMetric, setSelectedMetric] = useState<typeof metrics[0] | null>(null);
+  const [selectedMetric, setSelectedMetric] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [aiAdvice, setAiAdvice] = useState<string>("");
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
-  const handleMetricClick = (metric: typeof metrics[0]) => {
+  const [metrics, setMetrics] = useState<any[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(true);
+  const [faceDetected, setFaceDetected] = useState(true);
+
+  useEffect(() => {
+    const analyzeImages = async () => {
+      setIsAnalyzing(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('analyze-face', {
+          body: {
+            frontImage,
+            profileImage
+          }
+        });
+
+        if (error) throw error;
+
+        setFaceDetected(data.faceDetected);
+        
+        // Transform the API response into the metrics array
+        const analyzedMetrics = metricDefinitions.map(def => ({
+          title: def.title,
+          value: data.metrics[def.key].value,
+          ideal: def.ideal,
+          score: data.metrics[def.key].score,
+          color: def.color,
+          description: def.description
+        }));
+
+        setMetrics(analyzedMetrics);
+
+        if (!data.faceDetected) {
+          toast.error("No face detected in the images. All scores set to 0.");
+        } else {
+          toast.success("Facial analysis complete!");
+        }
+      } catch (error) {
+        console.error('Error analyzing face:', error);
+        toast.error("Failed to analyze face. Using default values.");
+        
+        // Set all metrics to 0
+        const zeroMetrics = metricDefinitions.map(def => ({
+          title: def.title,
+          value: "0.00",
+          ideal: def.ideal,
+          score: 0,
+          color: def.color,
+          description: def.description
+        }));
+        setMetrics(zeroMetrics);
+        setFaceDetected(false);
+      } finally {
+        setIsAnalyzing(false);
+      }
+    };
+
+    analyzeImages();
+  }, [frontImage, profileImage]);
+  const handleMetricClick = (metric: any) => {
     setSelectedMetric(metric);
     setIsDialogOpen(true);
   };
@@ -148,7 +208,20 @@ const AnalysisPanel = ({
       setIsLoadingAdvice(false);
     }
   };
-  const overallScore = (metrics.reduce((sum, m) => sum + m.score, 0) / metrics.length).toFixed(1);
+  const overallScore = metrics.length > 0 
+    ? (metrics.reduce((sum, m) => sum + m.score, 0) / metrics.length).toFixed(1)
+    : "0.0";
+
+  if (isAnalyzing) {
+    return <div className="min-h-screen px-4 py-12 flex items-center justify-center">
+      <div className="text-center space-y-4">
+        <Loader2 className="w-12 h-12 animate-spin text-cyan mx-auto" />
+        <h2 className="text-2xl font-bold">Analyzing Your Facial Structure...</h2>
+        <p className="text-muted-foreground">This may take a moment</p>
+      </div>
+    </div>;
+  }
+
   return <div className="min-h-screen px-4 py-12">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
