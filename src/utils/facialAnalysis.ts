@@ -78,7 +78,8 @@ export async function analyzeFace(imageDataUrl: string, isProfile: boolean = fal
     leftCheekbone: 454, // Bizygomatic point
     rightCheekbone: 234, // Bizygomatic point
     philtrumTop: 164, // Top of philtrum (under nose)
-    philtrumBottom: 13 // Bottom of philtrum (top of upper lip)
+    philtrumBottom: 13, // Bottom of philtrum (top of upper lip)
+    pronasale: isProfile ? 4 : 1 // Nose tip in profile (actual anterior point on nose)
   };
   
   // Extract key points
@@ -107,7 +108,8 @@ export async function analyzeFace(imageDataUrl: string, isProfile: boolean = fal
     leftCheekbone: landmarks[indices.leftCheekbone],
     rightCheekbone: landmarks[indices.rightCheekbone],
     philtrumTop: landmarks[indices.philtrumTop],
-    philtrumBottom: landmarks[indices.philtrumBottom]
+    philtrumBottom: landmarks[indices.philtrumBottom],
+    pronasale: landmarks[indices.pronasale] // Nose tip for profile measurements
   };
   
   // Calculate face center
@@ -253,8 +255,9 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
     nasalTipAngle = angle(profile.noseTop, profile.noseTip, profile.mouthTop);
     nasofrontalAngle = angle(profile.forehead, profile.noseTop, profile.noseTip);
     nasolabialAngle = angle(profile.noseTip, profile.noseBottom, profile.mouthTop);
-    facialConvexityGlabella = angle(profile.glabella, profile.noseTip, profile.chin);
-    facialConvexityNasion = angle(profile.noseTop, profile.noseTip, profile.chin);
+    // Use pronasale (better nose point for profile) instead of noseTip for convexity
+    facialConvexityGlabella = angle(profile.glabella, profile.pronasale, profile.chin);
+    facialConvexityNasion = angle(profile.noseTop, profile.pronasale, profile.chin);
     totalFacialConvexity = (facialConvexityGlabella + facialConvexityNasion) / 2;
   }
   
@@ -289,6 +292,7 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
       profile: profile ? {
         forehead: profile.forehead,
         noseTip: profile.noseTip,
+        pronasale: profile.pronasale, // Better nose point for profile convexity
         noseTop: profile.noseTop,
         lipTop: profile.mouthTop,
         chin: profile.chin,

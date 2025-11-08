@@ -664,19 +664,21 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
       case "facialConvexityGlabella":
       case "facialConvexityNasion":
       case "totalFacialConvexity":
-        if (!imageLandmarks.forehead || !imageLandmarks.noseTip || !imageLandmarks.chin) return null;
+        // Use pronasale (better profile nose point) instead of noseTip
+        const nosePoint = imageLandmarks.pronasale || imageLandmarks.noseTip;
+        if (!imageLandmarks.forehead || !nosePoint || !imageLandmarks.chin) return null;
         return (
           <>
             <line 
               x1={`${imageLandmarks.forehead.x * 100}%`}
               y1={`${imageLandmarks.forehead.y * 100}%`}
-              x2={`${imageLandmarks.noseTip.x * 100}%`}
-              y2={`${imageLandmarks.noseTip.y * 100}%`}
+              x2={`${nosePoint.x * 100}%`}
+              y2={`${nosePoint.y * 100}%`}
               stroke="hsl(var(--cyan))" strokeWidth="2"
             />
             <line 
-              x1={`${imageLandmarks.noseTip.x * 100}%`}
-              y1={`${imageLandmarks.noseTip.y * 100}%`}
+              x1={`${nosePoint.x * 100}%`}
+              y1={`${nosePoint.y * 100}%`}
               x2={`${imageLandmarks.chin.x * 100}%`}
               y2={`${imageLandmarks.chin.y * 100}%`}
               stroke="hsl(var(--magenta))" strokeWidth="2"
