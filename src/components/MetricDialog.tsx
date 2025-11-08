@@ -129,7 +129,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
       case "topThird":
       case "middleThird":
       case "lowerThird":
-        if (!imageLandmarks.faceCenter || !imageLandmarks.noseTop || !imageLandmarks.noseBottom || !imageLandmarks.eyeLeft || !imageLandmarks.jawLeft) return null;
+        if (!imageLandmarks.faceCenter || !imageLandmarks.noseTop || !imageLandmarks.noseBottom || !imageLandmarks.eyeLeft || !imageLandmarks.chin) return null;
         return (
           <>
             {/* Vertical center line */}
@@ -187,15 +187,15 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
             {/* Lower third boundary - chin */}
             <line 
               x1="10%"
-              y1={`${imageLandmarks.jawLeft.y * 100}%`}
+              y1={`${imageLandmarks.chin.y * 100}%`}
               x2="90%"
-              y2={`${imageLandmarks.jawLeft.y * 100}%`}
+              y2={`${imageLandmarks.chin.y * 100}%`}
               stroke="hsl(var(--magenta))" 
               strokeWidth="2"
             />
             <text
               x="50%"
-              y={`${((imageLandmarks.noseBottom.y + imageLandmarks.jawLeft.y) / 2 * 100 + 5)}%`}
+              y={`${((imageLandmarks.noseBottom.y + imageLandmarks.chin.y) / 2 * 100 + 5)}%`}
               fill="hsl(var(--cyan))"
               fontSize="14"
               fontWeight="bold"
