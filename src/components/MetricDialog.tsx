@@ -220,32 +220,55 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
         );
 
       case "noseToMouthRatio":
-        // Show nose base to upper lip distance vs nose to nose base distance
-        if (!imageLandmarks.noseTop || !imageLandmarks.noseBottom || !imageLandmarks.lipTop) return null;
+        // Show nose width vs mouth width comparison
+        if (!imageLandmarks.noseLeft || !imageLandmarks.noseRight || !imageLandmarks.leftMouth || !imageLandmarks.rightMouth) return null;
         return (
           <>
-            {/* Nose height (top to base) */}
+            {/* Nose width line */}
             <line 
-              x1={`${imageLandmarks.noseTop.x * 100}%`}
-              y1={`${imageLandmarks.noseTop.y * 100}%`}
-              x2={`${imageLandmarks.noseBottom.x * 100}%`}
-              y2={`${imageLandmarks.noseBottom.y * 100}%`}
+              x1={`${imageLandmarks.noseLeft.x * 100}%`}
+              y1={`${imageLandmarks.noseLeft.y * 100}%`}
+              x2={`${imageLandmarks.noseRight.x * 100}%`}
+              y2={`${imageLandmarks.noseRight.y * 100}%`}
               stroke="#00D4FF" 
               strokeWidth="3"
             />
-            {/* Nose to mouth distance */}
+            {/* Mouth width line */}
             <line 
-              x1={`${imageLandmarks.noseBottom.x * 100}%`}
-              y1={`${imageLandmarks.noseBottom.y * 100}%`}
-              x2={`${imageLandmarks.lipTop.x * 100}%`}
-              y2={`${imageLandmarks.lipTop.y * 100}%`}
+              x1={`${imageLandmarks.leftMouth.x * 100}%`}
+              y1={`${imageLandmarks.leftMouth.y * 100}%`}
+              x2={`${imageLandmarks.rightMouth.x * 100}%`}
+              y2={`${imageLandmarks.rightMouth.y * 100}%`}
               stroke="#FF00D4" 
               strokeWidth="3"
             />
-            {/* Markers */}
-            <circle cx={`${imageLandmarks.noseTop.x * 100}%`} cy={`${imageLandmarks.noseTop.y * 100}%`} r="4" fill="#00D4FF"/>
-            <circle cx={`${imageLandmarks.noseBottom.x * 100}%`} cy={`${imageLandmarks.noseBottom.y * 100}%`} r="4" fill="#FFFFFF"/>
-            <circle cx={`${imageLandmarks.lipTop.x * 100}%`} cy={`${imageLandmarks.lipTop.y * 100}%`} r="4" fill="#FF00D4"/>
+            {/* Nose markers */}
+            <circle cx={`${imageLandmarks.noseLeft.x * 100}%`} cy={`${imageLandmarks.noseLeft.y * 100}%`} r="4" fill="#00D4FF"/>
+            <circle cx={`${imageLandmarks.noseRight.x * 100}%`} cy={`${imageLandmarks.noseRight.y * 100}%`} r="4" fill="#00D4FF"/>
+            {/* Mouth markers */}
+            <circle cx={`${imageLandmarks.leftMouth.x * 100}%`} cy={`${imageLandmarks.leftMouth.y * 100}%`} r="4" fill="#FF00D4"/>
+            <circle cx={`${imageLandmarks.rightMouth.x * 100}%`} cy={`${imageLandmarks.rightMouth.y * 100}%`} r="4" fill="#FF00D4"/>
+            {/* Labels */}
+            <text
+              x={`${((imageLandmarks.noseLeft.x + imageLandmarks.noseRight.x) / 2) * 100}%`}
+              y={`${(imageLandmarks.noseLeft.y - 0.03) * 100}%`}
+              fill="#00D4FF"
+              fontSize="14"
+              fontWeight="bold"
+              textAnchor="middle"
+            >
+              Nose Width
+            </text>
+            <text
+              x={`${((imageLandmarks.leftMouth.x + imageLandmarks.rightMouth.x) / 2) * 100}%`}
+              y={`${(imageLandmarks.leftMouth.y + 0.05) * 100}%`}
+              fill="#FF00D4"
+              fontSize="14"
+              fontWeight="bold"
+              textAnchor="middle"
+            >
+              Mouth Width
+            </text>
           </>
         );
 

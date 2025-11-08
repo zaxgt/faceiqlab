@@ -36,10 +36,10 @@ const metricDefinitions = [{
   description: "The gonial angle defines your jawline sharpness. Angles within 120-130° create the most defined, masculine jaw structure."
 }, {
   key: "noseToMouthRatio",
-  title: "Nose-to-Mouth Ratio",
-  ideal: "1.20-1.30",
+  title: "Nose-to-Mouth Width Ratio",
+  ideal: "1.30-1.40",
   color: "cyan",
-  description: "This ratio measures the balance between your nose length and upper lip distance. Higher ratios indicate better facial proportionality."
+  description: "This ratio compares mouth width to nose width. An ideal ratio of 1.3-1.4 means your mouth should be 1.3-1.4 times wider than your nose for optimal facial balance."
 }, {
   key: "eyeToEyeSeparation",
   title: "Eye-to-Eye Separation",

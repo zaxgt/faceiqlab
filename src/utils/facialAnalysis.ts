@@ -164,7 +164,9 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
   const middleThirdPercent = (middleThirdHeight / totalFaceHeight) * 100;
   const lowerThirdPercent = (lowerThirdHeight / totalFaceHeight) * 100;
   
-  const noseToMouthRatio = distance(front.noseTip, front.noseTop) / distance(front.noseTip, front.mouthTop);
+  const noseWidth = distance(front.noseLeft, front.noseRight);
+  const mouthWidth = distance(front.leftMouth, front.rightMouth);
+  const noseToMouthRatio = mouthWidth / noseWidth; // Mouth width : Nose width ratio
   const eyeToEyeSeparation = eyeSeparation / eyeDistance;
   
   // Cantal tilt
@@ -213,6 +215,9 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
         noseLeft: front.noseLeft,
         noseRight: front.noseRight,
         mouthTop: front.mouthTop,
+        leftMouth: front.leftMouth,
+        rightMouth: front.rightMouth,
+        lipTop: front.mouthTop,
         jawLeft: front.leftJaw,
         jawRight: front.rightJaw,
         topThirdPercent: `${topThirdPercent.toFixed(1)}%`,
@@ -247,7 +252,7 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
       },
       noseToMouthRatio: { 
         value: noseToMouthRatio.toFixed(2), 
-        score: scoreMetric(noseToMouthRatio, 1.20, 1.30) 
+        score: scoreMetric(noseToMouthRatio, 1.30, 1.40) 
       },
       eyeToEyeSeparation: { 
         value: eyeToEyeSeparation.toFixed(2), 
