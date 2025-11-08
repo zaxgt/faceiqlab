@@ -63,8 +63,8 @@ export async function analyzeFace(imageDataUrl: string, isProfile: boolean = fal
     noseRight: 327,
     mouthTop: 13,
     mouthBottom: 14,
-    leftMouth: 61,
-    rightMouth: 291,
+    leftMouth: 78, // Inner lip corner (where lips meet)
+    rightMouth: 308, // Inner lip corner (where lips meet)
     leftJaw: 234,
     rightJaw: 454,
     chin: 152,
