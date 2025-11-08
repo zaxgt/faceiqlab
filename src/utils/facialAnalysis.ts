@@ -299,11 +299,11 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
       },
       middleThird: { 
         value: `${middleThirdPercent.toFixed(1)}%`, 
-        score: scoreMetric(middleThirdPercent, 30, 35) 
+        score: scoreMetric(middleThirdPercent, 25, 30) 
       },
       lowerThird: { 
         value: `${lowerThirdPercent.toFixed(1)}%`, 
-        score: scoreMetric(lowerThirdPercent, 25, 30) 
+        score: scoreMetric(lowerThirdPercent, 30, 40) 
       },
       gonialAngle: {
         value: `${gonialAngle.toFixed(1)}°`, 

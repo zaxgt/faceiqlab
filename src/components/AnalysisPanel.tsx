@@ -25,7 +25,7 @@ const metricDefinitions = [{
 }, {
   key: "lowerThird",
   title: "Lower Third Proportion",
-  ideal: "25-30%",
+  ideal: "30-40%",
   color: "cyan",
   description: "The lower third measures from nose bottom to chin. Balanced proportion creates strong, harmonious lower face structure."
 }, {
@@ -67,9 +67,9 @@ const metricDefinitions = [{
 }, {
   key: "middleThird",
   title: "Middle Third (Midface)",
-  ideal: "30-35%",
+  ideal: "25-30%",
   color: "magenta",
-  description: "The middle third measures from eyebrow line to nose bottom. This should be around 30-35% of your total face height for ideal harmony."
+  description: "The middle third measures from eyebrow line to nose bottom. This should be around 25-30% of your total face height for ideal harmony."
 }, {
   key: "gonialAngle",
   title: "Gonial Angle",
