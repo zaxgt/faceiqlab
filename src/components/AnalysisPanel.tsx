@@ -125,16 +125,10 @@ const metricDefinitions = [{
   color: "cyan",
   description: "Measures the forehead-to-midface curvature. Your measurement shows strong forward projection and balanced profile."
 }, {
-  key: "facialConvexityNasion",
-  title: "Facial Convexity (Nasion)",
-  ideal: "125-135°",
-  color: "magenta",
-  description: "This measures midface-to-nose harmony. Your convexity indicates excellent proportional smoothness."
-}, {
   key: "totalFacialConvexity",
   title: "Total Facial Convexity",
   ideal: "125-135°",
-  color: "cyan",
+  color: "magenta",
   description: "Overall facial profile curvature. Your measurement demonstrates strong dimensional proportionality."
 }, {
   key: "nasalHeightToWidthRatio",
