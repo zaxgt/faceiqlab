@@ -313,72 +313,75 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
 
       case "cantalTilt":
       case "eyebrowTilt":
+        const leftEyeInnerX = (imageLandmarks.eyeLeft.x - 0.06);
+        const leftEyeOuterX = (imageLandmarks.eyeLeft.x + 0.06);
+        const rightEyeInnerX = (imageLandmarks.eyeRight.x - 0.06);
+        const rightEyeOuterX = (imageLandmarks.eyeRight.x + 0.06);
+        
         return (
           <>
-            {/* Left eye measurement */}
+            {/* Left eye canthal line - bright cyan/blue */}
             <line 
-              x1={`${imageLandmarks.eyeLeft.x * 100}%`}
+              x1={`${leftEyeInnerX * 100}%`}
               y1={`${imageLandmarks.eyeLeft.y * 100}%`}
-              x2={`${imageLandmarks.eyeRight.x * 100}%`}
-              y2={`${imageLandmarks.eyeRight.y * 100}%`}
-              stroke="hsl(var(--cyan))" 
-              strokeWidth="3"
-            />
-            
-            {/* Horizontal reference lines for each eye */}
-            <line 
-              x1={`${(imageLandmarks.eyeLeft.x - 0.05) * 100}%`}
-              y1={`${imageLandmarks.eyeLeft.y * 100}%`}
-              x2={`${(imageLandmarks.eyeLeft.x + 0.05) * 100}%`}
+              x2={`${leftEyeOuterX * 100}%`}
               y2={`${imageLandmarks.eyeLeft.y * 100}%`}
-              stroke="hsl(var(--magenta))" 
-              strokeWidth="2"
-              strokeDasharray="4"
+              stroke="#00D4FF" 
+              strokeWidth="4"
+              strokeLinecap="round"
             />
+            
+            {/* Right eye canthal line - bright cyan/blue */}
             <line 
-              x1={`${(imageLandmarks.eyeRight.x - 0.05) * 100}%`}
+              x1={`${rightEyeInnerX * 100}%`}
               y1={`${imageLandmarks.eyeRight.y * 100}%`}
-              x2={`${(imageLandmarks.eyeRight.x + 0.05) * 100}%`}
+              x2={`${rightEyeOuterX * 100}%`}
               y2={`${imageLandmarks.eyeRight.y * 100}%`}
-              stroke="hsl(var(--magenta))" 
-              strokeWidth="2"
-              strokeDasharray="4"
+              stroke="#00D4FF" 
+              strokeWidth="4"
+              strokeLinecap="round"
             />
             
-            {/* Eye center markers */}
-            <circle 
-              cx={`${imageLandmarks.eyeLeft.x * 100}%`} 
-              cy={`${imageLandmarks.eyeLeft.y * 100}%`} 
-              r="4" 
-              fill="hsl(var(--cyan))"
-            />
-            <circle 
-              cx={`${imageLandmarks.eyeRight.x * 100}%`} 
-              cy={`${imageLandmarks.eyeRight.y * 100}%`} 
-              r="4" 
-              fill="hsl(var(--cyan))"
-            />
-            
-            {/* Angle labels */}
-            <text
-              x={`${(imageLandmarks.eyeLeft.x - 0.08) * 100}%`}
+            {/* Left eye angle label with background */}
+            <rect
+              x={`${(leftEyeInnerX - 0.02) * 100}%`}
               y={`${(imageLandmarks.eyeLeft.y + 0.05) * 100}%`}
-              fill="hsl(var(--cyan))"
-              fontSize="16"
-              fontWeight="bold"
-              className="drop-shadow-lg"
-            >
-              {Math.abs(parseFloat(metric.value))}°
-            </text>
+              width="12%"
+              height="7%"
+              fill="rgba(0, 212, 255, 0.9)"
+              rx="4"
+            />
             <text
-              x={`${(imageLandmarks.eyeRight.x + 0.03) * 100}%`}
-              y={`${(imageLandmarks.eyeRight.y + 0.05) * 100}%`}
-              fill="hsl(var(--cyan))"
+              x={`${(leftEyeInnerX + 0.04) * 100}%`}
+              y={`${(imageLandmarks.eyeLeft.y + 0.09) * 100}%`}
+              fill="white"
               fontSize="16"
               fontWeight="bold"
+              textAnchor="middle"
               className="drop-shadow-lg"
             >
-              {Math.abs(parseFloat(metric.value))}°
+              {Math.abs(parseFloat(metric.value)).toFixed(1)}°
+            </text>
+            
+            {/* Right eye angle label with background */}
+            <rect
+              x={`${(rightEyeOuterX - 0.10) * 100}%`}
+              y={`${(imageLandmarks.eyeRight.y + 0.05) * 100}%`}
+              width="12%"
+              height="7%"
+              fill="rgba(0, 212, 255, 0.9)"
+              rx="4"
+            />
+            <text
+              x={`${(rightEyeOuterX - 0.04) * 100}%`}
+              y={`${(imageLandmarks.eyeRight.y + 0.09) * 100}%`}
+              fill="white"
+              fontSize="16"
+              fontWeight="bold"
+              textAnchor="middle"
+              className="drop-shadow-lg"
+            >
+              {Math.abs(parseFloat(metric.value)).toFixed(1)}°
             </text>
           </>
         );
