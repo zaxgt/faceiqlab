@@ -32,7 +32,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
   // Front image: things visible from the front
   // Profile image: things visible from the side (angles, projections, convexity)
   const useFrontImage = [
-    "eyeToEyeSeparation", "cantalTilt", "eyebrowTilt", "yawSymmetry", 
+    "cantalTilt", "eyebrowTilt", "yawSymmetry", 
     "nasalHeightToWidthRatio", "topThird", "middleThird", "lowerThird", "noseToMouthRatio",
     "totalFacialWidthToHeightRatio", "bigonialToBizygomaticRatio", "eyeSeparationRatio",
     "eyesApartRatio", "faceWidthToHeightRatio", "chinToPhiltrumRatio"

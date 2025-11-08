@@ -217,7 +217,7 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
   const bigonialToBizygomaticRatio = (jawWidth / cheekboneWidth) * 100; // Jaw to cheekbone percentage
   const eyeSeparationRatio = (innerEyeDistance / cheekboneWidth) * 100; // Inner eye distance as % of face width
   const eyesApartRatio = eyeDistance / eyeDistance; // This needs clarification, using 1.0 for now
-  const faceWidthToHeightRatio = faceWidthAtEyeLevel / totalFaceHeight; // Face width at eye level to height
+  const faceWidthToHeightRatio = faceWidthAtEyeLevel / topThirdHeight; // Face width at eye level to forehead height
   const philtrumHeight = distance(front.philtrumTop, front.philtrumBottom);
   const chinHeight = distance(front.mouthBottom, front.chin);
   const chinToPhiltrumRatio = chinHeight / philtrumHeight;
@@ -295,7 +295,7 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
     metrics: {
       topThird: { 
         value: `${topThirdPercent.toFixed(1)}%`, 
-        score: scoreMetric(topThirdPercent, 30, 35) 
+        score: scoreMetric(topThirdPercent, 25, 30) 
       },
       middleThird: { 
         value: `${middleThirdPercent.toFixed(1)}%`, 
@@ -303,7 +303,7 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
       },
       lowerThird: { 
         value: `${lowerThirdPercent.toFixed(1)}%`, 
-        score: scoreMetric(lowerThirdPercent, 32, 37) 
+        score: scoreMetric(lowerThirdPercent, 25, 30) 
       },
       gonialAngle: {
         value: `${gonialAngle.toFixed(1)}°`, 
@@ -313,11 +313,7 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
         value: noseToMouthRatio.toFixed(2), 
         score: scoreNoseToMouthRatio(noseToMouthRatio) 
       },
-      eyeToEyeSeparation: { 
-        value: eyeToEyeSeparation.toFixed(2), 
-        score: scoreMetric(eyeToEyeSeparation, 0.42, 0.47) 
-      },
-      cantalTilt: { 
+      cantalTilt: {
         value: `${cantalTiltAngle.toFixed(1)}°`, 
         score: scoreMetric(Math.abs(cantalTiltAngle), 5, 8) 
       },
@@ -396,7 +392,6 @@ function getEmptyMetrics() {
     lowerThird: { value: "0.0%", score: 0 },
     gonialAngle: { value: "0.0°", score: 0 },
     noseToMouthRatio: { value: "0.00", score: 0 },
-    eyeToEyeSeparation: { value: "0.00", score: 0 },
     cantalTilt: { value: "0.0°", score: 0 },
     eyebrowTilt: { value: "0.0°", score: 0 },
     yawSymmetry: { value: "0.0%", score: 0 },

@@ -25,7 +25,7 @@ const metricDefinitions = [{
 }, {
   key: "lowerThird",
   title: "Lower Third Proportion",
-  ideal: "25.46-35.14%",
+  ideal: "25-30%",
   color: "cyan",
   description: "The lower third measures from nose bottom to chin. Balanced proportion creates strong, harmonious lower face structure."
 }, {
@@ -51,7 +51,7 @@ const metricDefinitions = [{
   title: "Face Width to Height Ratio",
   ideal: "1.58-2.36×",
   color: "cyan",
-  description: "This measures face width at eye level to total height. Balanced ratio defines overall facial shape and structure."
+  description: "This measures face width at eye level to forehead height. Balanced ratio defines overall facial shape and structure."
 }, {
   key: "chinToPhiltrumRatio",
   title: "Chin to Philtrum",
@@ -61,9 +61,9 @@ const metricDefinitions = [{
 }, {
   key: "topThird",
   title: "Top Third (Forehead)",
-  ideal: "30-35%",
+  ideal: "25-30%",
   color: "cyan",
-  description: "The top third measures your forehead height as a percentage of total face height. Ideally this should be around 30-35% for balanced facial proportions."
+  description: "The top third measures your forehead height as a percentage of total face height. Ideally this should be around 25-30% for balanced facial proportions."
 }, {
   key: "middleThird",
   title: "Middle Third (Midface)",
@@ -76,12 +76,6 @@ const metricDefinitions = [{
   ideal: "120-130°",
   color: "cyan",
   description: "The gonial angle defines your jawline sharpness. Angles within 120-130° create the most defined, masculine jaw structure."
-}, {
-  key: "eyeToEyeSeparation",
-  title: "Eye-to-Eye Separation",
-  ideal: "0.42-0.47",
-  color: "cyan",
-  description: "This ratio compares pupil-to-pupil distance to face width at eye level. An ideal ratio of 0.42-0.47 indicates harmonious eye spacing relative to face width."
 }, {
   key: "cantalTilt",
   title: "Cantal Tilt",
