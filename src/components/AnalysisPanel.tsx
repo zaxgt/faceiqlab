@@ -261,13 +261,13 @@ const AnalysisPanel = ({
         }}>
             <div className="grid grid-cols-2 gap-4">
               {/* Front Image */}
-              {frontImage && <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-magenta/30 glow-subtle">
-                  <img src={frontImage} alt="Front view analysis" className="w-full h-full object-cover" />
+              {frontImage && <div className="relative rounded-lg overflow-hidden border border-magenta/30 glow-subtle">
+                  <img src={frontImage} alt="Front view analysis" className="w-full object-contain" />
                 </div>}
               
               {/* Profile Image */}
-              {profileImage && <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-cyan/30 glow-subtle">
-                  <img src={profileImage} alt="Profile analysis" className="w-full h-full object-contain" />
+              {profileImage && <div className="relative rounded-lg overflow-hidden border border-cyan/30 glow-subtle">
+                  <img src={profileImage} alt="Profile analysis" className="w-full object-contain" />
                 </div>}
             </div>
           </div>
