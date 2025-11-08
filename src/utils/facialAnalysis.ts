@@ -116,17 +116,23 @@ export async function analyzeFace(imageDataUrl: string, isProfile: boolean = fal
 }
 
 function scoreMetric(value: number, idealMin: number, idealMax: number, maxScore: number = 10): number {
+  const midpoint = (idealMin + idealMax) / 2;
+  const idealRange = idealMax - idealMin;
+  
+  // Within ideal range = perfect score
   if (value >= idealMin && value <= idealMax) {
     return maxScore;
   }
   
-  const midpoint = (idealMin + idealMax) / 2;
-  const range = idealMax - idealMin;
-  const deviation = Math.abs(value - midpoint);
-  const maxDeviation = range * 2;
+  // Calculate how far outside the ideal range
+  const deviation = value < idealMin ? idealMin - value : value - idealMax;
   
-  const score = Math.max(0, maxScore - (deviation / maxDeviation) * maxScore);
-  return Math.round(score * 10) / 10;
+  // Use a gentler exponential decay curve
+  // Score decreases gradually, allowing values outside ideal to still score well
+  const normalizedDeviation = deviation / (idealRange * 0.5); // Normalize by half the ideal range
+  const score = maxScore * Math.exp(-0.5 * normalizedDeviation);
+  
+  return Math.max(0.1, Math.min(maxScore, Math.round(score * 10) / 10)); // Minimum 0.1 score
 }
 
 export async function calculateMetrics(frontImageUrl: string, profileImageUrl: string | null) {
