@@ -245,7 +245,10 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
   let totalFacialConvexity = 0;
   
   if (profile) {
-    gonialAngle = angle(profile.chin, profile.jawAngle, profile.forehead);
+    // Gonial angle: measured at jaw angle between mandibular plane (jaw-chin) and ramus (jaw-ear/forehead)
+    // Create a point above jawAngle for the ramus line (vertical reference)
+    const ramusReference = { x: profile.jawAngle.x, y: profile.forehead.y };
+    gonialAngle = angle(profile.chin, profile.jawAngle, ramusReference);
     nasalProjection = distance(profile.noseTop, profile.noseTip) * 100; // Convert to mm approximation
     nasalTipAngle = angle(profile.noseTop, profile.noseTip, profile.mouthTop);
     nasofrontalAngle = angle(profile.forehead, profile.noseTop, profile.noseTip);
