@@ -222,69 +222,214 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
     }
   };
 
+  // Generate score distribution curve data
+  const generateDistributionData = () => {
+    const points: {x: number, y: number}[] = [];
+    const idealMid = 5; // Peak at score 5
+    const sigma = 1.5; // Standard deviation
+    
+    for (let x = 0; x <= 10; x += 0.2) {
+      const y = Math.exp(-Math.pow(x - idealMid, 2) / (2 * sigma * sigma));
+      points.push({ x, y: y * 10 });
+    }
+    return points;
+  };
+
+  const distributionData = generateDistributionData();
+  const scorePosition = (metric.score / 10) * 100;
+  
+  // Determine assessment text based on score
+  const getAssessment = (score: number) => {
+    if (score >= 9.5) return "Exceptional";
+    if (score >= 9) return "Ideal";
+    if (score >= 8) return "Very Good";
+    if (score >= 7) return "Good";
+    if (score >= 6) return "Above Average";
+    if (score >= 5) return "Average";
+    return "Below Average";
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl bg-card border-cyan">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-cyan">
         <DialogHeader>
           <DialogTitle className="text-2xl text-cyan">{metric.title}</DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            Understanding your measurement
-          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 mt-4">
-          {/* Current vs Ideal */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-background/50 p-4 rounded-lg border border-border">
-              <p className="text-sm text-muted-foreground mb-1">Your Measurement</p>
-              <p className="text-2xl font-bold text-foreground">{metric.value}</p>
-            </div>
-            <div className="bg-background/50 p-4 rounded-lg border border-border">
-              <p className="text-sm text-muted-foreground mb-1">Ideal Range</p>
-              <p className="text-2xl font-bold text-cyan">{metric.ideal}</p>
-            </div>
-          </div>
-
-          {/* Score Visualization */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Score</span>
-              <span className="text-cyan font-semibold">{metric.score.toFixed(1)} / 10</span>
-            </div>
-            <div className="relative h-8 bg-muted rounded-full overflow-hidden">
-              <div
-                className={`absolute inset-y-0 left-0 ${
-                  metric.score >= 9 ? 'bg-gradient-to-r from-cyan to-cyan/60' :
-                  metric.score >= 7 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
-                  'bg-gradient-to-r from-red-500 to-red-700'
-                }`}
-                style={{ width: `${(metric.score / 10) * 100}%` }}
-              />
+        <div className="grid md:grid-cols-2 gap-6 mt-4">
+          {/* Left side - Image with measurement lines */}
+          <div className="space-y-4">
+            <div className="bg-background/50 p-4 rounded-lg border border-cyan/30">
+              <div className="relative w-full mx-auto rounded-lg overflow-hidden">
+                {displayImage && (
+                  <>
+                    <img 
+                      src={displayImage} 
+                      alt="Face measurement" 
+                      className="w-full h-auto object-contain max-h-[400px]"
+                    />
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                      {renderMeasurementLines()}
+                    </svg>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Image with Measurement Lines */}
-          <div className="bg-background/50 p-6 rounded-lg border border-cyan/30">
-            <p className="text-sm text-muted-foreground mb-4">Your Measurement Visualization</p>
-            <div className="relative w-full max-w-xs mx-auto rounded-lg overflow-hidden">
-              {displayImage && (
-                <>
-                  <img 
-                    src={displayImage} 
-                    alt="Face measurement" 
-                    className="w-full h-auto object-contain max-h-96"
+          {/* Right side - Score information */}
+          <div className="space-y-6">
+            {/* Score bar with gradient */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Target range</span>
+                <span className="text-muted-foreground">Normalized score (1-10)</span>
+              </div>
+              
+              <div className="text-center text-2xl font-bold text-foreground mb-2">
+                {metric.value}
+              </div>
+              
+              <div className="relative h-12 rounded-full overflow-hidden"
+                style={{
+                  background: 'linear-gradient(to right, #00ff00, #00ffff, #ff8800, #ff0000)'
+                }}
+              >
+                {/* Score marker */}
+                <div 
+                  className="absolute top-0 bottom-0 w-1 bg-white shadow-lg"
+                  style={{ left: `${scorePosition}%` }}
+                >
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rounded-full border-2 border-background shadow-lg" />
+                </div>
+              </div>
+              
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Ideal: {metric.ideal}</span>
+                <span>Max: 43.00 %</span>
+              </div>
+            </div>
+
+            {/* Your Assessment */}
+            <div className="bg-background/50 p-4 rounded-lg border border-border">
+              <h3 className="text-sm font-semibold text-cyan mb-2">YOUR ASSESSMENT</h3>
+              <p className="text-lg font-medium text-foreground">{getAssessment(metric.score)}</p>
+            </div>
+
+            {/* About this ratio */}
+            <div className="bg-background/50 p-4 rounded-lg border border-border">
+              <h3 className="text-sm font-semibold text-cyan mb-2">ABOUT THIS RATIO</h3>
+              <p className="text-sm text-foreground leading-relaxed">{metric.description}</p>
+            </div>
+
+            {/* Score Distribution */}
+            <div className="bg-background/50 p-4 rounded-lg border border-border">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-sm font-semibold text-cyan">Score Distribution</h3>
+                <div className="text-right text-xs text-muted-foreground">
+                  <div>Hover</div>
+                  <div className="text-cyan">{metric.ideal}</div>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mb-4">How points are awarded across ratio values</p>
+              
+              {/* Distribution curve */}
+              <div className="relative h-48 bg-background/80 rounded border border-border/50">
+                <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  {/* Grid lines */}
+                  {[0, 25, 50, 75, 100].map(y => (
+                    <line 
+                      key={y} 
+                      x1="0" 
+                      y1={100 - y} 
+                      x2="100" 
+                      y2={100 - y} 
+                      stroke="hsl(var(--border))" 
+                      strokeWidth="0.2"
+                      opacity="0.3"
+                    />
+                  ))}
+                  
+                  {/* Bell curve */}
+                  <polyline
+                    points={distributionData.map((p, i) => 
+                      `${(p.x / 10) * 100},${100 - (p.y * 10)}`
+                    ).join(' ')}
+                    fill="none"
+                    stroke="hsl(var(--cyan))"
+                    strokeWidth="1"
                   />
-                  <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                    {renderMeasurementLines()}
-                  </svg>
-                </>
-              )}
+                  
+                  {/* User's score marker */}
+                  <line
+                    x1={scorePosition}
+                    y1="0"
+                    x2={scorePosition}
+                    y2="100"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth="0.5"
+                    strokeDasharray="2,2"
+                  />
+                  <circle
+                    cx={scorePosition}
+                    cy={100 - (distributionData.find(p => Math.abs((p.x / 10) * 100 - scorePosition) < 5)?.y || 5) * 10}
+                    r="1.5"
+                    fill="hsl(var(--primary))"
+                  />
+                  
+                  {/* User value label */}
+                  <rect
+                    x={Math.max(0, Math.min(80, scorePosition - 10))}
+                    y="45"
+                    width="20"
+                    height="8"
+                    fill="hsl(var(--primary))"
+                    rx="1"
+                  />
+                  <text
+                    x={Math.max(10, Math.min(90, scorePosition))}
+                    y="50"
+                    fontSize="4"
+                    fill="white"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                  >
+                    Your Value: {metric.value}
+                  </text>
+                </svg>
+                
+                {/* X-axis labels */}
+                <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-xs text-muted-foreground">
+                  <span>19.00</span>
+                  <span>25.00</span>
+                  <span>30.00</span>
+                  <span>35.00</span>
+                  <span>40.00</span>
+                  <span>43.00</span>
+                </div>
+                
+                {/* Y-axis label */}
+                <div className="absolute -left-16 top-0 bottom-0 flex items-center">
+                  <span className="text-xs text-muted-foreground transform -rotate-90 whitespace-nowrap">
+                    Score (1-10 based on Overall)
+                  </span>
+                </div>
+              </div>
+              
+              <div className="text-center text-xs text-muted-foreground mt-8">
+                Top Third (%)
+              </div>
+              
+              {/* Score info box */}
+              <div className="mt-4 p-3 bg-background/80 rounded border border-cyan/30">
+                <div className="text-sm text-muted-foreground">
+                  Value: <span className="text-cyan font-semibold">{metric.value}</span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Score: <span className="text-cyan font-semibold">{metric.score.toFixed(2)} points</span>
+                </div>
+              </div>
             </div>
-          </div>
-
-          {/* Description */}
-          <div className="bg-gradient-to-r from-cyan/5 to-magenta/5 p-4 rounded-lg">
-            <p className="text-sm text-foreground leading-relaxed">{metric.description}</p>
           </div>
         </div>
       </DialogContent>
