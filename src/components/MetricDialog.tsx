@@ -42,6 +42,86 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
   const displayImage = useProfileImage ? profileImage : useFrontImage ? frontImage : null;
   const imageLandmarks = useProfileImage ? landmarks?.profile : useFrontImage ? landmarks?.front : null;
 
+  // Calculate zoom region based on metric type
+  const getZoomStyle = () => {
+    if (!imageLandmarks) return {};
+
+    switch (metric.key) {
+      case "eyeToEyeSeparation":
+      case "cantalTilt":
+      case "eyebrowTilt":
+        // Zoom to eye region
+        const eyeCenterX = ((imageLandmarks.eyeLeft?.x || 0.3) + (imageLandmarks.eyeRight?.x || 0.7)) / 2;
+        const eyeCenterY = ((imageLandmarks.eyeLeft?.y || 0.35) + (imageLandmarks.eyeRight?.y || 0.35)) / 2;
+        return {
+          transform: `scale(2.5) translate(${(0.5 - eyeCenterX) * 40}%, ${(0.35 - eyeCenterY) * 40}%)`,
+          transformOrigin: 'center center'
+        };
+      
+      case "nasalHeightToWidthRatio":
+      case "noseToMouthRatio":
+        // Zoom to nose region
+        const noseCenterX = imageLandmarks.noseTip?.x || 0.5;
+        const noseCenterY = imageLandmarks.noseTip?.y || 0.5;
+        return {
+          transform: `scale(2.2) translate(${(0.5 - noseCenterX) * 45}%, ${(0.5 - noseCenterY) * 45}%)`,
+          transformOrigin: 'center center'
+        };
+      
+      case "topThird":
+        // Zoom to show full face thirds
+        return {
+          transform: 'scale(1.3)',
+          transformOrigin: 'center 30%'
+        };
+      
+      case "middleThird":
+        return {
+          transform: 'scale(1.3)',
+          transformOrigin: 'center 50%'
+        };
+      
+      case "lowerThird":
+        return {
+          transform: 'scale(1.3)',
+          transformOrigin: 'center 70%'
+        };
+      
+      case "yawSymmetry":
+        // Full face view
+        return {
+          transform: 'scale(1.2)',
+          transformOrigin: 'center center'
+        };
+      
+      case "gonialAngle":
+      case "facialConvexityGlabella":
+      case "facialConvexityNasion":
+      case "totalFacialConvexity":
+        // Profile view - show jaw/chin area
+        return {
+          transform: 'scale(1.5)',
+          transformOrigin: 'center 60%'
+        };
+      
+      case "nasalProjection":
+      case "nasalTipAngle":
+      case "nasofrontalAngle":
+      case "nasolabialAngle":
+        // Profile nose area
+        return {
+          transform: 'scale(2)',
+          transformOrigin: 'center 45%'
+        };
+      
+      default:
+        return {
+          transform: 'scale(1.2)',
+          transformOrigin: 'center center'
+        };
+    }
+  };
+
   // Function to render measurement lines based on metric type
   const renderMeasurementLines = () => {
     if (!imageLandmarks) return null;
@@ -160,15 +240,74 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
       case "eyeToEyeSeparation":
         return (
           <>
-            <circle cx={`${imageLandmarks.eyeLeft.x * 100}%`} cy={`${imageLandmarks.eyeLeft.y * 100}%`} r="8" fill="none" stroke="hsl(var(--cyan))" strokeWidth="2"/>
-            <circle cx={`${imageLandmarks.eyeRight.x * 100}%`} cy={`${imageLandmarks.eyeRight.y * 100}%`} r="8" fill="none" stroke="hsl(var(--cyan))" strokeWidth="2"/>
+            {/* Vertical center line */}
+            <line 
+              x1={`${imageLandmarks.faceCenter.x * 100}%`}
+              y1="5%"
+              x2={`${imageLandmarks.faceCenter.x * 100}%`}
+              y2="95%"
+              stroke="hsl(var(--cyan))" 
+              strokeWidth="2"
+            />
+            
+            {/* Horizontal eye line */}
+            <line 
+              x1="10%"
+              y1={`${imageLandmarks.eyeLeft.y * 100}%`}
+              x2="90%"
+              y2={`${imageLandmarks.eyeRight.y * 100}%`}
+              stroke="hsl(var(--cyan))" 
+              strokeWidth="2"
+            />
+            
+            {/* Eye separation measurement line */}
             <line 
               x1={`${imageLandmarks.eyeLeft.x * 100}%`}
               y1={`${imageLandmarks.eyeLeft.y * 100}%`}
               x2={`${imageLandmarks.eyeRight.x * 100}%`}
               y2={`${imageLandmarks.eyeRight.y * 100}%`}
-              stroke="hsl(var(--magenta))" strokeWidth="2" strokeDasharray="4"
+              stroke="hsl(var(--magenta))" 
+              strokeWidth="3"
             />
+            
+            {/* Eye markers */}
+            <circle 
+              cx={`${imageLandmarks.eyeLeft.x * 100}%`} 
+              cy={`${imageLandmarks.eyeLeft.y * 100}%`} 
+              r="6" 
+              fill="none" 
+              stroke="hsl(var(--cyan))" 
+              strokeWidth="2"
+            />
+            <circle 
+              cx={`${imageLandmarks.eyeRight.x * 100}%`} 
+              cy={`${imageLandmarks.eyeRight.y * 100}%`} 
+              r="6" 
+              fill="none" 
+              stroke="hsl(var(--cyan))" 
+              strokeWidth="2"
+            />
+            
+            {/* Value label */}
+            <rect
+              x={`${(imageLandmarks.faceCenter.x - 0.08) * 100}%`}
+              y={`${(imageLandmarks.eyeLeft.y + 0.08) * 100}%`}
+              width="16%"
+              height="6%"
+              fill="hsl(var(--cyan))"
+              rx="4"
+            />
+            <text
+              x={`${imageLandmarks.faceCenter.x * 100}%`}
+              y={`${(imageLandmarks.eyeLeft.y + 0.12) * 100}%`}
+              fill="white"
+              fontSize="14"
+              fontWeight="bold"
+              textAnchor="middle"
+              className="drop-shadow-lg"
+            >
+              {metric.value}
+            </text>
           </>
         );
 
@@ -176,15 +315,71 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
       case "eyebrowTilt":
         return (
           <>
+            {/* Left eye measurement */}
             <line 
               x1={`${imageLandmarks.eyeLeft.x * 100}%`}
               y1={`${imageLandmarks.eyeLeft.y * 100}%`}
               x2={`${imageLandmarks.eyeRight.x * 100}%`}
               y2={`${imageLandmarks.eyeRight.y * 100}%`}
-              stroke="hsl(var(--cyan))" strokeWidth="2"
+              stroke="hsl(var(--cyan))" 
+              strokeWidth="3"
             />
-            <circle cx={`${imageLandmarks.eyeLeft.x * 100}%`} cy={`${imageLandmarks.eyeLeft.y * 100}%`} r="4" fill="hsl(var(--magenta))"/>
-            <circle cx={`${imageLandmarks.eyeRight.x * 100}%`} cy={`${imageLandmarks.eyeRight.y * 100}%`} r="4" fill="hsl(var(--magenta))"/>
+            
+            {/* Horizontal reference lines for each eye */}
+            <line 
+              x1={`${(imageLandmarks.eyeLeft.x - 0.05) * 100}%`}
+              y1={`${imageLandmarks.eyeLeft.y * 100}%`}
+              x2={`${(imageLandmarks.eyeLeft.x + 0.05) * 100}%`}
+              y2={`${imageLandmarks.eyeLeft.y * 100}%`}
+              stroke="hsl(var(--magenta))" 
+              strokeWidth="2"
+              strokeDasharray="4"
+            />
+            <line 
+              x1={`${(imageLandmarks.eyeRight.x - 0.05) * 100}%`}
+              y1={`${imageLandmarks.eyeRight.y * 100}%`}
+              x2={`${(imageLandmarks.eyeRight.x + 0.05) * 100}%`}
+              y2={`${imageLandmarks.eyeRight.y * 100}%`}
+              stroke="hsl(var(--magenta))" 
+              strokeWidth="2"
+              strokeDasharray="4"
+            />
+            
+            {/* Eye center markers */}
+            <circle 
+              cx={`${imageLandmarks.eyeLeft.x * 100}%`} 
+              cy={`${imageLandmarks.eyeLeft.y * 100}%`} 
+              r="4" 
+              fill="hsl(var(--cyan))"
+            />
+            <circle 
+              cx={`${imageLandmarks.eyeRight.x * 100}%`} 
+              cy={`${imageLandmarks.eyeRight.y * 100}%`} 
+              r="4" 
+              fill="hsl(var(--cyan))"
+            />
+            
+            {/* Angle labels */}
+            <text
+              x={`${(imageLandmarks.eyeLeft.x - 0.08) * 100}%`}
+              y={`${(imageLandmarks.eyeLeft.y + 0.05) * 100}%`}
+              fill="hsl(var(--cyan))"
+              fontSize="16"
+              fontWeight="bold"
+              className="drop-shadow-lg"
+            >
+              {Math.abs(parseFloat(metric.value))}°
+            </text>
+            <text
+              x={`${(imageLandmarks.eyeRight.x + 0.03) * 100}%`}
+              y={`${(imageLandmarks.eyeRight.y + 0.05) * 100}%`}
+              fill="hsl(var(--cyan))"
+              fontSize="16"
+              fontWeight="bold"
+              className="drop-shadow-lg"
+            >
+              {Math.abs(parseFloat(metric.value))}°
+            </text>
           </>
         );
 
@@ -311,19 +506,21 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
         <div className="grid md:grid-cols-2 gap-6 mt-4">
           {/* Left side - Image with measurement lines */}
           <div className="space-y-4">
-            <div className="bg-background/50 p-4 rounded-lg border border-cyan/30">
-              <div className="relative w-full mx-auto rounded-lg overflow-hidden">
+            <div className="bg-background/50 p-4 rounded-lg border border-cyan/30 overflow-hidden">
+              <div className="relative w-full mx-auto rounded-lg overflow-hidden h-[400px] bg-black/10">
                 {displayImage && (
-                  <>
-                    <img 
-                      src={displayImage} 
-                      alt="Face measurement" 
-                      className="w-full h-auto object-contain max-h-[400px]"
-                    />
-                    <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                      {renderMeasurementLines()}
-                    </svg>
-                  </>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="relative w-full h-full transition-transform duration-300" style={getZoomStyle()}>
+                      <img 
+                        src={displayImage} 
+                        alt="Face measurement" 
+                        className="w-full h-full object-contain"
+                      />
+                      <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                        {renderMeasurementLines()}
+                      </svg>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
