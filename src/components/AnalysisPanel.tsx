@@ -11,11 +11,23 @@ interface AnalysisPanelProps {
   frontImage: string | null;
 }
 const metricDefinitions = [{
-  key: "midfaceRatio",
-  title: "Midface Ratio",
-  ideal: "0.95-1.00",
+  key: "topThird",
+  title: "Top Third (Forehead)",
+  ideal: "30-35%",
   color: "cyan",
-  description: "The midface ratio measures the vertical proportion of your middle face. A ratio closer to the golden proportion creates balanced facial harmony."
+  description: "The top third measures your forehead height as a percentage of total face height. Ideally this should be around 30-35% for balanced facial proportions."
+}, {
+  key: "middleThird",
+  title: "Middle Third (Midface)",
+  ideal: "30-35%",
+  color: "magenta",
+  description: "The middle third measures from eyebrow line to nose bottom. This should be around 30-35% of your total face height for ideal harmony."
+}, {
+  key: "lowerThird",
+  title: "Lower Third (Jaw)",
+  ideal: "32-37%",
+  color: "cyan",
+  description: "The lower third measures from nose bottom to chin. Slightly larger than the other thirds (32-37%) creates a strong, balanced lower face."
 }, {
   key: "gonialAngle",
   title: "Gonial Angle",
@@ -55,7 +67,7 @@ const metricDefinitions = [{
 }, {
   key: "nasalProjection",
   title: "Nasal Projection",
-  ideal: "12-16mm",
+  ideal: "12-18mm",
   color: "cyan",
   description: "Nasal projection measures how far your nose extends from your face. Your measurement shows excellent dimensional balance."
 }, {

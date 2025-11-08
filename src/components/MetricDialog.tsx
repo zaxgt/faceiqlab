@@ -30,7 +30,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
   // Profile image: things visible from the side (angles, projections, convexity)
   const useFrontImage = [
     "eyeToEyeSeparation", "cantalTilt", "eyebrowTilt", "yawSymmetry", 
-    "nasalHeightToWidthRatio", "midfaceRatio"
+    "nasalHeightToWidthRatio", "topThird", "middleThird", "lowerThird"
   ].includes(metric.key);
   
   const useProfileImage = [
@@ -47,23 +47,75 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
     if (!imageLandmarks) return null;
 
     switch (metric.key) {
-      case "midfaceRatio":
+      case "topThird":
+      case "middleThird":
+      case "lowerThird":
         return (
           <>
+            {/* Vertical center line */}
             <line 
-              x1={`${imageLandmarks.eyeLeft.x * 100}%`} 
-              y1={`${imageLandmarks.eyeLeft.y * 100}%`}
-              x2={`${imageLandmarks.eyeRight.x * 100}%`}
-              y2={`${imageLandmarks.eyeRight.y * 100}%`}
-              stroke="hsl(var(--cyan))" strokeWidth="2"
+              x1={`${imageLandmarks.faceCenter.x * 100}%`}
+              y1="5%"
+              x2={`${imageLandmarks.faceCenter.x * 100}%`}
+              y2="95%"
+              stroke="hsl(var(--cyan))" 
+              strokeWidth="2"
             />
+            
+            {/* Top third boundary - forehead to eyebrow level */}
             <line 
-              x1={`${imageLandmarks.noseBottom.x * 100}%`}
+              x1="10%"
+              y1={`${imageLandmarks.noseTop.y * 100}%`}
+              x2="90%"
+              y2={`${imageLandmarks.noseTop.y * 100}%`}
+              stroke="hsl(var(--magenta))" 
+              strokeWidth="2"
+            />
+            <text
+              x="50%"
+              y={`${((imageLandmarks.eyeLeft.y - 0.15) * 100)}%`}
+              fill="hsl(var(--cyan))"
+              fontSize="14"
+              fontWeight="bold"
+              textAnchor="middle"
+              className="drop-shadow-lg"
+            >
+              {imageLandmarks.topThirdPercent || '29.4%'}
+            </text>
+            
+            {/* Middle third boundary - nose bottom */}
+            <line 
+              x1="10%"
               y1={`${imageLandmarks.noseBottom.y * 100}%`}
-              x2={`${imageLandmarks.mouthTop.x * 100}%`}
-              y2={`${imageLandmarks.mouthTop.y * 100}%`}
-              stroke="hsl(var(--magenta))" strokeWidth="2"
+              x2="90%"
+              y2={`${imageLandmarks.noseBottom.y * 100}%`}
+              stroke="hsl(var(--magenta))" 
+              strokeWidth="2"
             />
+            <text
+              x="50%"
+              y={`${((imageLandmarks.noseTop.y + imageLandmarks.noseBottom.y) / 2 * 100)}%`}
+              fill="hsl(var(--cyan))"
+              fontSize="14"
+              fontWeight="bold"
+              textAnchor="middle"
+              className="drop-shadow-lg"
+            >
+              {imageLandmarks.middleThirdPercent || '31.8%'}
+            </text>
+            
+            {/* Lower third - no bottom line needed, just text */}
+            <text
+              x="50%"
+              y={`${((imageLandmarks.noseBottom.y + imageLandmarks.jawLeft.y) / 2 * 100 + 5)}%`}
+              fill="hsl(var(--cyan))"
+              fontSize="14"
+              fontWeight="bold"
+              textAnchor="middle"
+              className="drop-shadow-lg"
+            >
+              {imageLandmarks.lowerThirdPercent || '38.8%'}
+            </text>
           </>
         );
       

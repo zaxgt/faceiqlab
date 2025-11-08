@@ -153,10 +153,17 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
   // Calculate metrics
   const eyeDistance = distance(front.leftEye, front.rightEye);
   const eyeSeparation = distance(front.leftEyeInner, front.rightEyeInner);
-  const midfaceHeight = distance(front.noseTop, front.noseBottom);
-  const lowerFaceHeight = distance(front.noseBottom, front.chin);
   
-  const midfaceRatio = midfaceHeight / lowerFaceHeight;
+  // Face thirds - measure from forehead to eyebrow line, eyebrow line to nose bottom, nose bottom to chin
+  const topThirdHeight = distance(front.forehead, front.noseTop); // Forehead to eyebrow level (using noseTop as proxy)
+  const middleThirdHeight = distance(front.noseTop, front.noseBottom); // Eyebrow to nose bottom
+  const lowerThirdHeight = distance(front.noseBottom, front.chin); // Nose bottom to chin
+  const totalFaceHeight = topThirdHeight + middleThirdHeight + lowerThirdHeight;
+  
+  const topThirdPercent = (topThirdHeight / totalFaceHeight) * 100;
+  const middleThirdPercent = (middleThirdHeight / totalFaceHeight) * 100;
+  const lowerThirdPercent = (lowerThirdHeight / totalFaceHeight) * 100;
+  
   const noseToMouthRatio = distance(front.noseTip, front.noseTop) / distance(front.noseTip, front.mouthTop);
   const eyeToEyeSeparation = eyeSeparation / eyeDistance;
   
@@ -207,7 +214,10 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
         noseRight: front.noseRight,
         mouthTop: front.mouthTop,
         jawLeft: front.leftJaw,
-        jawRight: front.rightJaw
+        jawRight: front.rightJaw,
+        topThirdPercent: `${topThirdPercent.toFixed(1)}%`,
+        middleThirdPercent: `${middleThirdPercent.toFixed(1)}%`,
+        lowerThirdPercent: `${lowerThirdPercent.toFixed(1)}%`
       },
       profile: profile ? {
         forehead: profile.forehead,
@@ -219,11 +229,19 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
       } : null
     },
     metrics: {
-      midfaceRatio: { 
-        value: midfaceRatio.toFixed(2), 
-        score: scoreMetric(midfaceRatio, 0.95, 1.00) 
+      topThird: { 
+        value: `${topThirdPercent.toFixed(1)}%`, 
+        score: scoreMetric(topThirdPercent, 30, 35) 
       },
-      gonialAngle: { 
+      middleThird: { 
+        value: `${middleThirdPercent.toFixed(1)}%`, 
+        score: scoreMetric(middleThirdPercent, 30, 35) 
+      },
+      lowerThird: { 
+        value: `${lowerThirdPercent.toFixed(1)}%`, 
+        score: scoreMetric(lowerThirdPercent, 32, 37) 
+      },
+      gonialAngle: {
         value: `${gonialAngle.toFixed(1)}°`, 
         score: profile ? scoreMetric(gonialAngle, 120, 130) : 0 
       },
@@ -285,7 +303,9 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
 
 function getEmptyMetrics() {
   return {
-    midfaceRatio: { value: "0.00", score: 0 },
+    topThird: { value: "0.0%", score: 0 },
+    middleThird: { value: "0.0%", score: 0 },
+    lowerThird: { value: "0.0%", score: 0 },
     gonialAngle: { value: "0.0°", score: 0 },
     noseToMouthRatio: { value: "0.00", score: 0 },
     eyeToEyeSeparation: { value: "0.00", score: 0 },
