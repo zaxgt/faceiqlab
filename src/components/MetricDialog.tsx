@@ -184,7 +184,15 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
               {imageLandmarks.middleThirdPercent || '31.8%'}
             </text>
             
-            {/* Lower third - no bottom line needed, just text */}
+            {/* Lower third boundary - chin */}
+            <line 
+              x1="10%"
+              y1={`${imageLandmarks.jawLeft.y * 100}%`}
+              x2="90%"
+              y2={`${imageLandmarks.jawLeft.y * 100}%`}
+              stroke="hsl(var(--magenta))" 
+              strokeWidth="2"
+            />
             <text
               x="50%"
               y={`${((imageLandmarks.noseBottom.y + imageLandmarks.jawLeft.y) / 2 * 100 + 5)}%`}
