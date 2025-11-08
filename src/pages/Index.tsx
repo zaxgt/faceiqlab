@@ -18,6 +18,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
+      {/* Invisible overlay to cover Lovable badge */}
+      <div className="fixed bottom-4 right-4 w-32 h-12 bg-background z-[9999]" />
+      
       {stage === "hero" && <Hero onBegin={handleBegin} />}
       {stage === "upload" && (
         <UploadSection
