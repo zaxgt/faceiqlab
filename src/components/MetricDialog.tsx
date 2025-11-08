@@ -130,6 +130,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
       case "topThird":
       case "middleThird":
       case "lowerThird":
+        if (!imageLandmarks.faceCenter || !imageLandmarks.noseTop || !imageLandmarks.noseBottom || !imageLandmarks.eyeLeft || !imageLandmarks.jawLeft) return null;
         return (
           <>
             {/* Vertical center line */}
@@ -200,6 +201,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
         );
       
       case "gonialAngle":
+        if (!imageLandmarks.jawAngle || !imageLandmarks.chin) return null;
         return (
           <>
             <line 
@@ -219,6 +221,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
 
       case "noseToMouthRatio":
         // Show nose base to upper lip distance vs nose to nose base distance
+        if (!imageLandmarks.noseTop || !imageLandmarks.noseBottom || !imageLandmarks.lipTop) return null;
         return (
           <>
             {/* Nose height (top to base) */}
@@ -247,6 +250,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
         );
 
       case "eyeToEyeSeparation":
+        if (!imageLandmarks.faceCenter || !imageLandmarks.eyeLeft || !imageLandmarks.eyeRight) return null;
         return (
           <>
             {/* Vertical center line */}
@@ -322,6 +326,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
 
       case "cantalTilt":
       case "eyebrowTilt":
+        if (!imageLandmarks.eyeLeft || !imageLandmarks.eyeRight) return null;
         const leftEyeInnerX = (imageLandmarks.eyeLeft.x - 0.06);
         const leftEyeOuterX = (imageLandmarks.eyeLeft.x + 0.06);
         const rightEyeInnerX = (imageLandmarks.eyeRight.x - 0.06);
@@ -428,6 +433,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
         );
 
       case "yawSymmetry":
+        if (!imageLandmarks.faceCenter || !imageLandmarks.eyeLeft || !imageLandmarks.eyeRight) return null;
         return (
           <>
             <line 
@@ -444,6 +450,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
 
       case "nasalProjection":
         // Show projection distance from face plane to nose tip
+        if (!imageLandmarks.noseTip) return null;
         return (
           <>
             {/* Face plane reference line */}
@@ -494,6 +501,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
 
       case "nasalTipAngle":
         // Show the angle at the tip of the nose
+        if (!imageLandmarks.noseTop || !imageLandmarks.noseTip) return null;
         return (
           <>
             {/* Line from nose bridge to tip */}
@@ -546,6 +554,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
 
       case "nasofrontalAngle":
         // Show the angle where nose meets forehead
+        if (!imageLandmarks.noseTop || !imageLandmarks.noseTip) return null;
         return (
           <>
             {/* Forehead to nose bridge line */}
@@ -598,6 +607,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
 
       case "nasolabialAngle":
         // Show the angle between nose base and upper lip
+        if (!imageLandmarks.noseTip || !imageLandmarks.lipTop) return null;
         return (
           <>
             {/* Line from nose tip down to columella */}
@@ -651,6 +661,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
       case "facialConvexityGlabella":
       case "facialConvexityNasion":
       case "totalFacialConvexity":
+        if (!imageLandmarks.forehead || !imageLandmarks.noseTip || !imageLandmarks.chin) return null;
         return (
           <>
             <line 
@@ -671,6 +682,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
         );
 
       case "nasalHeightToWidthRatio":
+        if (!imageLandmarks.noseTop || !imageLandmarks.noseBottom || !imageLandmarks.noseLeft || !imageLandmarks.noseRight || !imageLandmarks.noseTip) return null;
         return (
           <>
             <line 
