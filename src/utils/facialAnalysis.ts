@@ -74,7 +74,11 @@ export async function analyzeFace(imageDataUrl: string, isProfile: boolean = fal
     leftEyeInner: 133,
     rightEyeInner: 362,
     jawAngle: isProfile ? 172 : 234,
-    glabella: 9
+    glabella: 9,
+    leftCheekbone: 454, // Bizygomatic point
+    rightCheekbone: 234, // Bizygomatic point
+    philtrumTop: 164, // Top of philtrum (under nose)
+    philtrumBottom: 13 // Bottom of philtrum (top of upper lip)
   };
   
   // Extract key points
@@ -99,7 +103,11 @@ export async function analyzeFace(imageDataUrl: string, isProfile: boolean = fal
     leftEyeInner: landmarks[indices.leftEyeInner],
     rightEyeInner: landmarks[indices.rightEyeInner],
     jawAngle: landmarks[indices.jawAngle],
-    glabella: landmarks[indices.glabella]
+    glabella: landmarks[indices.glabella],
+    leftCheekbone: landmarks[indices.leftCheekbone],
+    rightCheekbone: landmarks[indices.rightCheekbone],
+    philtrumTop: landmarks[indices.philtrumTop],
+    philtrumBottom: landmarks[indices.philtrumBottom]
   };
   
   // Calculate face center
@@ -153,6 +161,9 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
   // Calculate metrics
   const eyeDistance = distance(front.leftEye, front.rightEye); // Pupil to pupil
   const faceWidthAtEyeLevel = distance(front.leftJaw, front.rightJaw); // Face width at eye level
+  const cheekboneWidth = distance(front.leftCheekbone, front.rightCheekbone); // Bizygomatic width
+  const jawWidth = distance(front.leftJaw, front.rightJaw); // Bigonial width
+  const innerEyeDistance = distance(front.leftEyeInner, front.rightEyeInner);
   
   // Face thirds - measure from forehead to eyebrow line, eyebrow line to nose bottom, nose bottom to chin
   const topThirdHeight = distance(front.forehead, front.noseTop); // Forehead to eyebrow level (using noseTop as proxy)
@@ -168,6 +179,16 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
   const mouthWidth = distance(front.leftMouth, front.rightMouth);
   const noseToMouthRatio = mouthWidth / noseWidth; // Mouth width : Nose width ratio
   const eyeToEyeSeparation = eyeDistance / faceWidthAtEyeLevel; // Pupil distance to face width ratio
+  
+  // New metrics from the reference
+  const totalFacialWidthToHeightRatio = cheekboneWidth / totalFaceHeight; // Widest point to height
+  const bigonialToBizygomaticRatio = (jawWidth / cheekboneWidth) * 100; // Jaw to cheekbone percentage
+  const eyeSeparationRatio = (innerEyeDistance / cheekboneWidth) * 100; // Inner eye distance as % of face width
+  const eyesApartRatio = eyeDistance / eyeDistance; // This needs clarification, using 1.0 for now
+  const faceWidthToHeightRatio = faceWidthAtEyeLevel / totalFaceHeight; // Face width at eye level to height
+  const philtrumHeight = distance(front.philtrumTop, front.philtrumBottom);
+  const chinHeight = distance(front.mouthBottom, front.chin);
+  const chinToPhiltrumRatio = chinHeight / philtrumHeight;
   
   // Cantal tilt
   const cantalTiltAngle = Math.atan2(front.rightEye.y - front.leftEye.y, front.rightEye.x - front.leftEye.x) * (180 / Math.PI);
@@ -220,6 +241,12 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
         lipTop: front.mouthTop,
         jawLeft: front.leftJaw,
         jawRight: front.rightJaw,
+        leftCheekbone: front.leftCheekbone,
+        rightCheekbone: front.rightCheekbone,
+        philtrumTop: front.philtrumTop,
+        philtrumBottom: front.philtrumBottom,
+        chin: front.chin,
+        forehead: front.forehead,
         topThirdPercent: `${topThirdPercent.toFixed(1)}%`,
         middleThirdPercent: `${middleThirdPercent.toFixed(1)}%`,
         lowerThirdPercent: `${lowerThirdPercent.toFixed(1)}%`
@@ -301,6 +328,30 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
       nasalHeightToWidthRatio: { 
         value: nasalHeightToWidthRatio.toFixed(2), 
         score: scoreMetric(nasalHeightToWidthRatio, 1.00, 1.20) 
+      },
+      totalFacialWidthToHeightRatio: {
+        value: `${totalFacialWidthToHeightRatio.toFixed(2)}×`,
+        score: scoreMetric(totalFacialWidthToHeightRatio, 1.12, 1.57)
+      },
+      bigonialToBizygomaticRatio: {
+        value: `${bigonialToBizygomaticRatio.toFixed(2)}%`,
+        score: scoreMetric(bigonialToBizygomaticRatio, 66.40, 109.60)
+      },
+      eyeSeparationRatio: {
+        value: `${eyeSeparationRatio.toFixed(2)}%`,
+        score: scoreMetric(eyeSeparationRatio, 38.40, 53.60)
+      },
+      eyesApartRatio: {
+        value: `${eyesApartRatio.toFixed(2)}×`,
+        score: scoreMetric(eyesApartRatio, 0.65, 1.26)
+      },
+      faceWidthToHeightRatio: {
+        value: `${faceWidthToHeightRatio.toFixed(2)}×`,
+        score: scoreMetric(faceWidthToHeightRatio, 1.58, 2.36)
+      },
+      chinToPhiltrumRatio: {
+        value: `${chinToPhiltrumRatio.toFixed(2)}×`,
+        score: scoreMetric(chinToPhiltrumRatio, 0.80, 3.80)
       }
     }
   };
@@ -324,6 +375,12 @@ function getEmptyMetrics() {
     facialConvexityGlabella: { value: "0.0°", score: 0 },
     facialConvexityNasion: { value: "0.0°", score: 0 },
     totalFacialConvexity: { value: "0.0°", score: 0 },
-    nasalHeightToWidthRatio: { value: "0.00", score: 0 }
+    nasalHeightToWidthRatio: { value: "0.00", score: 0 },
+    totalFacialWidthToHeightRatio: { value: "0.00×", score: 0 },
+    bigonialToBizygomaticRatio: { value: "0.00%", score: 0 },
+    eyeSeparationRatio: { value: "0.00%", score: 0 },
+    eyesApartRatio: { value: "0.00×", score: 0 },
+    faceWidthToHeightRatio: { value: "0.00×", score: 0 },
+    chinToPhiltrumRatio: { value: "0.00×", score: 0 }
   };
 }

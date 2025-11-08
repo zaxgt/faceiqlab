@@ -30,7 +30,9 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
   // Profile image: things visible from the side (angles, projections, convexity)
   const useFrontImage = [
     "eyeToEyeSeparation", "cantalTilt", "eyebrowTilt", "yawSymmetry", 
-    "nasalHeightToWidthRatio", "topThird", "middleThird", "lowerThird", "noseToMouthRatio"
+    "nasalHeightToWidthRatio", "topThird", "middleThird", "lowerThird", "noseToMouthRatio",
+    "totalFacialWidthToHeightRatio", "bigonialToBizygomaticRatio", "eyeSeparationRatio",
+    "eyesApartRatio", "faceWidthToHeightRatio", "chinToPhiltrumRatio"
   ].includes(metric.key);
   
   const useProfileImage = [
@@ -703,6 +705,150 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
               y2={`${imageLandmarks.noseTip.y * 100}%`}
               stroke="hsl(var(--magenta))" strokeWidth="2"
             />
+          </>
+        );
+
+      case "totalFacialWidthToHeightRatio":
+        if (!imageLandmarks.leftCheekbone || !imageLandmarks.rightCheekbone || !imageLandmarks.forehead || !imageLandmarks.chin) return null;
+        return (
+          <>
+            {/* Horizontal width line at cheekbones */}
+            <line 
+              x1={`${imageLandmarks.leftCheekbone.x * 100}%`}
+              y1={`${imageLandmarks.leftCheekbone.y * 100}%`}
+              x2={`${imageLandmarks.rightCheekbone.x * 100}%`}
+              y2={`${imageLandmarks.rightCheekbone.y * 100}%`}
+              stroke="#00D4FF" strokeWidth="3"
+            />
+            {/* Vertical height line */}
+            <line 
+              x1={`${((imageLandmarks.leftCheekbone.x + imageLandmarks.rightCheekbone.x) / 2) * 100}%`}
+              y1={`${imageLandmarks.forehead.y * 100}%`}
+              x2={`${((imageLandmarks.leftCheekbone.x + imageLandmarks.rightCheekbone.x) / 2) * 100}%`}
+              y2={`${imageLandmarks.chin.y * 100}%`}
+              stroke="#FF00D4" strokeWidth="3"
+            />
+            <text x={`${((imageLandmarks.leftCheekbone.x + imageLandmarks.rightCheekbone.x) / 2) * 100}%`} y={`${(imageLandmarks.leftCheekbone.y - 0.03) * 100}%`} fill="#00D4FF" fontSize="12" fontWeight="bold" textAnchor="middle">Width</text>
+            <text x={`${((imageLandmarks.leftCheekbone.x + imageLandmarks.rightCheekbone.x) / 2 + 0.06) * 100}%`} y={`${((imageLandmarks.forehead.y + imageLandmarks.chin.y) / 2) * 100}%`} fill="#FF00D4" fontSize="12" fontWeight="bold" textAnchor="middle">Height</text>
+          </>
+        );
+
+      case "bigonialToBizygomaticRatio":
+        if (!imageLandmarks.jawLeft || !imageLandmarks.jawRight || !imageLandmarks.leftCheekbone || !imageLandmarks.rightCheekbone) return null;
+        return (
+          <>
+            {/* Jaw width (bigonial) */}
+            <line 
+              x1={`${imageLandmarks.jawLeft.x * 100}%`}
+              y1={`${imageLandmarks.jawLeft.y * 100}%`}
+              x2={`${imageLandmarks.jawRight.x * 100}%`}
+              y2={`${imageLandmarks.jawRight.y * 100}%`}
+              stroke="#FF00D4" strokeWidth="3"
+            />
+            {/* Cheekbone width (bizygomatic) */}
+            <line 
+              x1={`${imageLandmarks.leftCheekbone.x * 100}%`}
+              y1={`${imageLandmarks.leftCheekbone.y * 100}%`}
+              x2={`${imageLandmarks.rightCheekbone.x * 100}%`}
+              y2={`${imageLandmarks.rightCheekbone.y * 100}%`}
+              stroke="#00D4FF" strokeWidth="3"
+            />
+            <text x="50%" y={`${(imageLandmarks.leftCheekbone.y - 0.03) * 100}%`} fill="#00D4FF" fontSize="12" fontWeight="bold" textAnchor="middle">Cheekbones</text>
+            <text x="50%" y={`${(imageLandmarks.jawLeft.y + 0.03) * 100}%`} fill="#FF00D4" fontSize="12" fontWeight="bold" textAnchor="middle">Jaw</text>
+          </>
+        );
+
+      case "eyeSeparationRatio":
+        if (!imageLandmarks.eyeLeft || !imageLandmarks.eyeRight || !imageLandmarks.leftCheekbone || !imageLandmarks.rightCheekbone) return null;
+        const innerLeft = imageLandmarks.eyeLeft;
+        const innerRight = imageLandmarks.eyeRight;
+        return (
+          <>
+            {/* Inner eye distance */}
+            <line 
+              x1={`${innerLeft.x * 100}%`}
+              y1={`${innerLeft.y * 100}%`}
+              x2={`${innerRight.x * 100}%`}
+              y2={`${innerRight.y * 100}%`}
+              stroke="#FF00D4" strokeWidth="3"
+            />
+            {/* Face width */}
+            <line 
+              x1={`${imageLandmarks.leftCheekbone.x * 100}%`}
+              y1={`${imageLandmarks.leftCheekbone.y * 100}%`}
+              x2={`${imageLandmarks.rightCheekbone.x * 100}%`}
+              y2={`${imageLandmarks.rightCheekbone.y * 100}%`}
+              stroke="#00D4FF" strokeWidth="3"
+            />
+            <text x="50%" y={`${(innerLeft.y - 0.03) * 100}%`} fill="#FF00D4" fontSize="12" fontWeight="bold" textAnchor="middle">Eye Gap</text>
+            <text x="50%" y={`${(imageLandmarks.leftCheekbone.y + 0.05) * 100}%`} fill="#00D4FF" fontSize="12" fontWeight="bold" textAnchor="middle">Face Width</text>
+          </>
+        );
+
+      case "eyesApartRatio":
+        if (!imageLandmarks.eyeLeft || !imageLandmarks.eyeRight) return null;
+        return (
+          <>
+            <line 
+              x1={`${imageLandmarks.eyeLeft.x * 100}%`}
+              y1={`${imageLandmarks.eyeLeft.y * 100}%`}
+              x2={`${imageLandmarks.eyeRight.x * 100}%`}
+              y2={`${imageLandmarks.eyeRight.y * 100}%`}
+              stroke="#00D4FF" strokeWidth="3"
+            />
+            <circle cx={`${imageLandmarks.eyeLeft.x * 100}%`} cy={`${imageLandmarks.eyeLeft.y * 100}%`} r="4" fill="#00D4FF"/>
+            <circle cx={`${imageLandmarks.eyeRight.x * 100}%`} cy={`${imageLandmarks.eyeRight.y * 100}%`} r="4" fill="#00D4FF"/>
+            <text x="50%" y={`${(imageLandmarks.eyeLeft.y - 0.03) * 100}%`} fill="#00D4FF" fontSize="12" fontWeight="bold" textAnchor="middle">Pupil Distance</text>
+          </>
+        );
+
+      case "faceWidthToHeightRatio":
+        if (!imageLandmarks.jawLeft || !imageLandmarks.jawRight || !imageLandmarks.forehead || !imageLandmarks.chin) return null;
+        return (
+          <>
+            {/* Face width at jaw level */}
+            <line 
+              x1={`${imageLandmarks.jawLeft.x * 100}%`}
+              y1={`${imageLandmarks.jawLeft.y * 100}%`}
+              x2={`${imageLandmarks.jawRight.x * 100}%`}
+              y2={`${imageLandmarks.jawRight.y * 100}%`}
+              stroke="#00D4FF" strokeWidth="3"
+            />
+            {/* Face height */}
+            <line 
+              x1={`${((imageLandmarks.jawLeft.x + imageLandmarks.jawRight.x) / 2) * 100}%`}
+              y1={`${imageLandmarks.forehead.y * 100}%`}
+              x2={`${((imageLandmarks.jawLeft.x + imageLandmarks.jawRight.x) / 2) * 100}%`}
+              y2={`${imageLandmarks.chin.y * 100}%`}
+              stroke="#FF00D4" strokeWidth="3"
+            />
+            <text x="50%" y={`${(imageLandmarks.jawLeft.y + 0.03) * 100}%`} fill="#00D4FF" fontSize="12" fontWeight="bold" textAnchor="middle">Width</text>
+            <text x={`${((imageLandmarks.jawLeft.x + imageLandmarks.jawRight.x) / 2 + 0.06) * 100}%`} y={`${((imageLandmarks.forehead.y + imageLandmarks.chin.y) / 2) * 100}%`} fill="#FF00D4" fontSize="12" fontWeight="bold" textAnchor="middle">Height</text>
+          </>
+        );
+
+      case "chinToPhiltrumRatio":
+        if (!imageLandmarks.philtrumTop || !imageLandmarks.philtrumBottom || !imageLandmarks.chin || !imageLandmarks.mouthTop) return null;
+        return (
+          <>
+            {/* Philtrum height */}
+            <line 
+              x1={`${imageLandmarks.philtrumTop.x * 100}%`}
+              y1={`${imageLandmarks.philtrumTop.y * 100}%`}
+              x2={`${imageLandmarks.philtrumBottom.x * 100}%`}
+              y2={`${imageLandmarks.philtrumBottom.y * 100}%`}
+              stroke="#00D4FF" strokeWidth="3"
+            />
+            {/* Chin height */}
+            <line 
+              x1={`${imageLandmarks.mouthTop.x * 100}%`}
+              y1={`${imageLandmarks.mouthTop.y * 100}%`}
+              x2={`${imageLandmarks.chin.x * 100}%`}
+              y2={`${imageLandmarks.chin.y * 100}%`}
+              stroke="#FF00D4" strokeWidth="3"
+            />
+            <text x={`${(imageLandmarks.philtrumTop.x - 0.06) * 100}%`} y={`${((imageLandmarks.philtrumTop.y + imageLandmarks.philtrumBottom.y) / 2) * 100}%`} fill="#00D4FF" fontSize="12" fontWeight="bold" textAnchor="middle">Philtrum</text>
+            <text x={`${(imageLandmarks.mouthTop.x + 0.06) * 100}%`} y={`${((imageLandmarks.mouthTop.y + imageLandmarks.chin.y) / 2) * 100}%`} fill="#FF00D4" fontSize="12" fontWeight="bold" textAnchor="middle">Chin</text>
           </>
         );
 
