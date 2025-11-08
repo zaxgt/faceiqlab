@@ -103,11 +103,8 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
       case "facialConvexityGlabella":
       case "facialConvexityNasion":
       case "totalFacialConvexity":
-        // Profile view - show jaw/chin area
-        return {
-          transform: 'scale(1.5)',
-          transformOrigin: 'center 60%'
-        };
+        // Profile view - show full image without zoom
+        return {};
       
       case "nasalProjection":
       case "nasalTipAngle":
