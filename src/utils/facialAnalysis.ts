@@ -346,15 +346,15 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
       },
       facialConvexityGlabella: { 
         value: `${facialConvexityGlabella.toFixed(1)}°`, 
-        score: profile ? scoreMetric(facialConvexityGlabella, 165, 175) : 0 
+        score: profile ? scoreMetric(facialConvexityGlabella, 155, 170) : 0 
       },
       facialConvexityNasion: { 
         value: `${facialConvexityNasion.toFixed(1)}°`, 
-        score: profile ? scoreMetric(facialConvexityNasion, 160, 170) : 0 
+        score: profile ? scoreMetric(facialConvexityNasion, 125, 135) : 0 
       },
       totalFacialConvexity: { 
         value: `${totalFacialConvexity.toFixed(1)}°`, 
-        score: profile ? scoreMetric(totalFacialConvexity, 165, 175) : 0 
+        score: profile ? scoreMetric(totalFacialConvexity, 125, 135) : 0 
       },
       nasalHeightToWidthRatio: { 
         value: nasalHeightToWidthRatio.toFixed(2), 
