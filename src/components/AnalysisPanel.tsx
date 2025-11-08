@@ -1,8 +1,9 @@
 import MetricBar from "@/components/MetricBar";
 import MetricDialog from "@/components/MetricDialog";
 import TierRatingCard from "@/components/TierRatingCard";
-import { Star, Loader2 } from "lucide-react";
+import { Star, Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -145,6 +146,8 @@ const AnalysisPanel = ({
   const [isAnalyzing, setIsAnalyzing] = useState(true);
   const [faceDetected, setFaceDetected] = useState(true);
   const [landmarks, setLandmarks] = useState<any>(null);
+  const [contactMessage, setContactMessage] = useState("");
+  const [isSendingContact, setIsSendingContact] = useState(false);
   useEffect(() => {
     const analyzeImages = async () => {
       if (!frontImage) return;
@@ -220,6 +223,33 @@ const AnalysisPanel = ({
       setIsLoadingAdvice(false);
     }
   };
+
+  const handleSendContact = async () => {
+    if (!contactMessage.trim()) {
+      toast.error("Please enter a message");
+      return;
+    }
+
+    setIsSendingContact(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-contact', {
+        body: {
+          message: contactMessage,
+          rating: overallScore
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast.success("Message sent successfully!");
+      setContactMessage("");
+    } catch (error) {
+      console.error('Error sending contact message:', error);
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setIsSendingContact(false);
+    }
+  };
   const overallScore = metrics.length > 0 ? (metrics.reduce((sum, m) => sum + m.score, 0) / metrics.length).toFixed(1) : "0.0";
   const tierRating = calculateTierRating(parseFloat(overallScore));
 
@@ -274,6 +304,35 @@ const AnalysisPanel = ({
         {/* Tier Rating Card */}
         <div className="mt-16 animate-slide-up" style={{ animationDelay: "0.8s" }}>
           <TierRatingCard tierRating={tierRating} overallScore={overallScore} />
+        </div>
+
+        {/* Contact Box */}
+        <div className="mt-8 bg-card border border-cyan/30 rounded-lg p-6 space-y-4 animate-slide-up" style={{ animationDelay: "0.9s" }}>
+          <h3 className="text-xl font-bold text-cyan">Contact & Feedback</h3>
+          <p className="text-sm text-muted-foreground">Have questions or want to share your thoughts? Send us a message!</p>
+          <Textarea
+            value={contactMessage}
+            onChange={(e) => setContactMessage(e.target.value)}
+            placeholder="Type your message here..."
+            className="min-h-[100px] resize-none"
+          />
+          <Button 
+            onClick={handleSendContact} 
+            disabled={isSendingContact || !contactMessage.trim()}
+            className="w-full bg-cyan text-black hover:bg-cyan/90"
+          >
+            {isSendingContact ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4 mr-2" />
+                Send Message
+              </>
+            )}
+          </Button>
         </div>
 
         {/* Overall Ratings */}
