@@ -273,76 +273,57 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
         );
 
       case "eyeToEyeSeparation":
-        if (!imageLandmarks.faceCenter || !imageLandmarks.eyeLeft || !imageLandmarks.eyeRight) return null;
+        if (!imageLandmarks.eyeLeft || !imageLandmarks.eyeRight || !imageLandmarks.jawLeft || !imageLandmarks.jawRight) return null;
         return (
           <>
-            {/* Vertical center line */}
+            {/* Face width at eye level (jaw to jaw) */}
             <line 
-              x1={`${imageLandmarks.faceCenter.x * 100}%`}
-              y1="5%"
-              x2={`${imageLandmarks.faceCenter.x * 100}%`}
-              y2="95%"
-              stroke="hsl(var(--cyan))" 
-              strokeWidth="2"
-            />
-            
-            {/* Horizontal eye line */}
-            <line 
-              x1="10%"
+              x1={`${imageLandmarks.jawLeft.x * 100}%`}
               y1={`${imageLandmarks.eyeLeft.y * 100}%`}
-              x2="90%"
+              x2={`${imageLandmarks.jawRight.x * 100}%`}
               y2={`${imageLandmarks.eyeRight.y * 100}%`}
-              stroke="hsl(var(--cyan))" 
-              strokeWidth="2"
+              stroke="#00D4FF" 
+              strokeWidth="3"
             />
             
-            {/* Eye separation measurement line */}
+            {/* Pupil to pupil distance */}
             <line 
               x1={`${imageLandmarks.eyeLeft.x * 100}%`}
               y1={`${imageLandmarks.eyeLeft.y * 100}%`}
               x2={`${imageLandmarks.eyeRight.x * 100}%`}
               y2={`${imageLandmarks.eyeRight.y * 100}%`}
-              stroke="hsl(var(--magenta))" 
+              stroke="#FF00D4" 
               strokeWidth="3"
             />
             
             {/* Eye markers */}
-            <circle 
-              cx={`${imageLandmarks.eyeLeft.x * 100}%`} 
-              cy={`${imageLandmarks.eyeLeft.y * 100}%`} 
-              r="6" 
-              fill="none" 
-              stroke="hsl(var(--cyan))" 
-              strokeWidth="2"
-            />
-            <circle 
-              cx={`${imageLandmarks.eyeRight.x * 100}%`} 
-              cy={`${imageLandmarks.eyeRight.y * 100}%`} 
-              r="6" 
-              fill="none" 
-              stroke="hsl(var(--cyan))" 
-              strokeWidth="2"
-            />
+            <circle cx={`${imageLandmarks.eyeLeft.x * 100}%`} cy={`${imageLandmarks.eyeLeft.y * 100}%`} r="4" fill="#FF00D4"/>
+            <circle cx={`${imageLandmarks.eyeRight.x * 100}%`} cy={`${imageLandmarks.eyeRight.y * 100}%`} r="4" fill="#FF00D4"/>
             
-            {/* Value label */}
-            <rect
-              x={`${(imageLandmarks.faceCenter.x - 0.08) * 100}%`}
-              y={`${(imageLandmarks.eyeLeft.y + 0.08) * 100}%`}
-              width="16%"
-              height="6%"
-              fill="hsl(var(--cyan))"
-              rx="4"
-            />
+            {/* Jaw markers */}
+            <circle cx={`${imageLandmarks.jawLeft.x * 100}%`} cy={`${imageLandmarks.eyeLeft.y * 100}%`} r="4" fill="#00D4FF"/>
+            <circle cx={`${imageLandmarks.jawRight.x * 100}%`} cy={`${imageLandmarks.eyeRight.y * 100}%`} r="4" fill="#00D4FF"/>
+            
+            {/* Labels */}
             <text
-              x={`${imageLandmarks.faceCenter.x * 100}%`}
-              y={`${(imageLandmarks.eyeLeft.y + 0.12) * 100}%`}
-              fill="white"
+              x={`${((imageLandmarks.eyeLeft.x + imageLandmarks.eyeRight.x) / 2) * 100}%`}
+              y={`${(imageLandmarks.eyeLeft.y - 0.03) * 100}%`}
+              fill="#FF00D4"
               fontSize="14"
               fontWeight="bold"
               textAnchor="middle"
-              className="drop-shadow-lg"
             >
-              {metric.value}
+              Pupil Distance
+            </text>
+            <text
+              x={`${((imageLandmarks.jawLeft.x + imageLandmarks.jawRight.x) / 2) * 100}%`}
+              y={`${(imageLandmarks.eyeLeft.y + 0.05) * 100}%`}
+              fill="#00D4FF"
+              fontSize="14"
+              fontWeight="bold"
+              textAnchor="middle"
+            >
+              Face Width
             </text>
           </>
         );

@@ -151,8 +151,8 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
   const profile = profileAnalysis?.landmarks;
   
   // Calculate metrics
-  const eyeDistance = distance(front.leftEye, front.rightEye);
-  const eyeSeparation = distance(front.leftEyeInner, front.rightEyeInner);
+  const eyeDistance = distance(front.leftEye, front.rightEye); // Pupil to pupil
+  const faceWidthAtEyeLevel = distance(front.leftJaw, front.rightJaw); // Face width at eye level
   
   // Face thirds - measure from forehead to eyebrow line, eyebrow line to nose bottom, nose bottom to chin
   const topThirdHeight = distance(front.forehead, front.noseTop); // Forehead to eyebrow level (using noseTop as proxy)
@@ -167,7 +167,7 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
   const noseWidth = distance(front.noseLeft, front.noseRight);
   const mouthWidth = distance(front.leftMouth, front.rightMouth);
   const noseToMouthRatio = mouthWidth / noseWidth; // Mouth width : Nose width ratio
-  const eyeToEyeSeparation = eyeSeparation / eyeDistance;
+  const eyeToEyeSeparation = eyeDistance / faceWidthAtEyeLevel; // Pupil distance to face width ratio
   
   // Cantal tilt
   const cantalTiltAngle = Math.atan2(front.rightEye.y - front.leftEye.y, front.rightEye.x - front.leftEye.x) * (180 / Math.PI);
@@ -256,7 +256,7 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
       },
       eyeToEyeSeparation: { 
         value: eyeToEyeSeparation.toFixed(2), 
-        score: scoreMetric(eyeToEyeSeparation, 0.88, 0.95) 
+        score: scoreMetric(eyeToEyeSeparation, 0.42, 0.47) 
       },
       cantalTilt: { 
         value: `${cantalTiltAngle.toFixed(1)}°`, 

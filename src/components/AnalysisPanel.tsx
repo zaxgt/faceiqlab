@@ -43,9 +43,9 @@ const metricDefinitions = [{
 }, {
   key: "eyeToEyeSeparation",
   title: "Eye-to-Eye Separation",
-  ideal: "0.88-0.95",
+  ideal: "0.42-0.47",
   color: "cyan",
-  description: "Interocular spacing affects perceived facial balance. Your measurement falls within the ideal range for harmonious eye placement."
+  description: "This ratio compares pupil-to-pupil distance to face width at eye level. An ideal ratio of 0.42-0.47 indicates harmonious eye spacing relative to face width."
 }, {
   key: "cantalTilt",
   title: "Cantal Tilt",
