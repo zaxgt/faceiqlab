@@ -34,38 +34,38 @@ export const calculateTierRating = (overallScore: number): TierRating => {
       description: "Model level aesthetics. Professional appeal.",
       color: "from-purple-400 via-pink-500 to-rose-600"
     };
-  } else if (overallScore >= 7) {
+  } else if (overallScore >= 6.5) {
     return {
       tier: "HTN",
-      percentile: "Top 5%",
+      percentile: "Top 10%",
       description: "High tier normie. Really good looking.",
       color: "from-green-400 via-emerald-500 to-teal-600"
     };
-  } else if (overallScore >= 6) {
+  } else if (overallScore >= 5.5) {
     return {
       tier: "MTN",
-      percentile: "Top 30%",
-      description: "Mid tier normie. Average to decent proportions.",
+      percentile: "Average (50th)",
+      description: "Mid tier normie. Average facial proportions.",
       color: "from-yellow-500 via-amber-500 to-orange-500"
     };
-  } else if (overallScore >= 5) {
+  } else if (overallScore >= 4.5) {
     return {
       tier: "LTN",
-      percentile: "50th Percentile",
+      percentile: "Bottom 35%",
       description: "Low tier normie. Below average features.",
       color: "from-orange-500 via-orange-600 to-red-500"
     };
-  } else if (overallScore >= 4) {
+  } else if (overallScore >= 3.5) {
     return {
       tier: "SUB 5",
-      percentile: "Bottom 30%",
+      percentile: "Bottom 20%",
       description: "Significant areas for improvement.",
       color: "from-red-500 via-red-600 to-red-700"
     };
-  } else if (overallScore >= 3) {
+  } else if (overallScore >= 2.5) {
     return {
       tier: "SUB 3",
-      percentile: "Bottom 10%",
+      percentile: "Bottom 5%",
       description: "Major aesthetic challenges present.",
       color: "from-red-700 via-red-800 to-red-900"
     };
