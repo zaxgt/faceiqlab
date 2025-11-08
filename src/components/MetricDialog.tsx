@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useState } from "react";
 
 interface MetricDialogProps {
   isOpen: boolean;
@@ -24,6 +25,8 @@ interface MetricDialogProps {
 
 const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landmarks }: MetricDialogProps) => {
   if (!metric) return null;
+  
+  const [hoverPoint, setHoverPoint] = useState<{x: number, y: number, score: number, value: string} | null>(null);
 
   // Determine which image to show based on metric type
   // Front image: things visible from the front
@@ -857,21 +860,113 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
     }
   };
 
-  // Generate score distribution curve data
+  // Generate score distribution curve data based on metric type
   const generateDistributionData = () => {
-    const points: {x: number, y: number}[] = [];
-    const idealMid = 5; // Peak at score 5
-    const sigma = 1.5; // Standard deviation
+    const points: {x: number, y: number, value: string}[] = [];
     
-    for (let x = 0; x <= 10; x += 0.2) {
-      const y = Math.exp(-Math.pow(x - idealMid, 2) / (2 * sigma * sigma));
-      points.push({ x, y: y * 10 });
+    // Parse ideal range from metric
+    const idealMatch = metric.ideal.match(/([\d.]+)-([\d.]+)/);
+    if (!idealMatch) return points;
+    
+    const idealMin = parseFloat(idealMatch[1]);
+    const idealMax = parseFloat(idealMatch[2]);
+    const idealMid = (idealMin + idealMax) / 2;
+    const range = idealMax - idealMin;
+    
+    // Generate curve points from min to max with extra padding
+    const minX = idealMin - range * 2;
+    const maxX = idealMax + range * 2;
+    const step = (maxX - minX) / 100;
+    
+    for (let x = minX; x <= maxX; x += step) {
+      // Calculate score at this x value based on metric type
+      let score = 0;
+      if (metric.key === "noseToMouthRatio") {
+        // Custom scoring for nose to mouth ratio
+        const peakPoint = 1.3;
+        if (x >= 1.2 && x <= peakPoint) {
+          score = 10;
+        } else if (x > peakPoint && x <= 1.35) {
+          const distanceFromPeak = x - peakPoint;
+          const rangeAfterPeak = 1.35 - peakPoint;
+          const dropFactor = distanceFromPeak / rangeAfterPeak;
+          score = 10 * (1 - dropFactor * 0.15);
+        } else if (x < 1.2) {
+          const deviation = 1.2 - x;
+          score = 10 * Math.exp(-2.0 * deviation);
+        } else {
+          const deviation = x - 1.35;
+          score = 10 * 0.85 * Math.exp(-0.8 * deviation);
+        }
+      } else {
+        // Standard bell curve for other metrics
+        if (x >= idealMin && x <= idealMax) {
+          score = 10;
+        } else {
+          const deviation = x < idealMin ? idealMin - x : x - idealMax;
+          const normalizedDeviation = deviation / (range * 0.5);
+          score = 10 * Math.exp(-0.5 * normalizedDeviation);
+        }
+      }
+      
+      score = Math.max(0.1, Math.min(10, score));
+      
+      // Format value based on metric type
+      let formattedValue = x.toFixed(2);
+      if (metric.value.includes('%')) {
+        formattedValue = x.toFixed(1) + '%';
+      } else if (metric.value.includes('°')) {
+        formattedValue = x.toFixed(1) + '°';
+      } else if (metric.value.includes('mm')) {
+        formattedValue = x.toFixed(1) + 'mm';
+      } else if (metric.value.includes('×')) {
+        formattedValue = x.toFixed(2) + '×';
+      }
+      
+      points.push({ x, y: score, value: formattedValue });
     }
     return points;
   };
 
   const distributionData = generateDistributionData();
-  const scorePosition = (metric.score / 10) * 100;
+  
+  const handleChartHover = (event: React.MouseEvent<SVGSVGElement>) => {
+    const svg = event.currentTarget;
+    const rect = svg.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    
+    if (distributionData.length === 0) return;
+    
+    // Find closest point
+    const minX = distributionData[0].x;
+    const maxX = distributionData[distributionData.length - 1].x;
+    const actualX = minX + (x / 100) * (maxX - minX);
+    
+    const closestPoint = distributionData.reduce((prev, curr) => 
+      Math.abs(curr.x - actualX) < Math.abs(prev.x - actualX) ? curr : prev
+    );
+    
+    setHoverPoint({
+      x: ((closestPoint.x - minX) / (maxX - minX)) * 100,
+      y: 100 - (closestPoint.y * 10),
+      score: closestPoint.y,
+      value: closestPoint.value
+    });
+  };
+
+  const handleChartLeave = () => {
+    setHoverPoint(null);
+  };
+
+  const scorePosition = (() => {
+    if (distributionData.length === 0) return 50;
+    const minX = distributionData[0].x;
+    const maxX = distributionData[distributionData.length - 1].x;
+    
+    // Parse current value
+    const currentValue = parseFloat(metric.value);
+    return ((currentValue - minX) / (maxX - minX)) * 100;
+  })();
   
   // Determine assessment text based on score
   const getAssessment = (score: number) => {
@@ -971,8 +1066,14 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
               <p className="text-xs text-muted-foreground mb-4">How points are awarded across ratio values</p>
               
               {/* Distribution curve */}
-              <div className="relative h-48 bg-background/80 rounded border border-border/50">
-                <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <div className="relative h-48 bg-gradient-to-b from-background/95 to-background/80 rounded border border-border/50">
+                <svg 
+                  className="w-full h-full cursor-crosshair" 
+                  viewBox="0 0 100 100" 
+                  preserveAspectRatio="none"
+                  onMouseMove={handleChartHover}
+                  onMouseLeave={handleChartLeave}
+                >
                   {/* Grid lines */}
                   {[0, 25, 50, 75, 100].map(y => (
                     <line 
@@ -987,15 +1088,48 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                     />
                   ))}
                   
-                  {/* Bell curve */}
-                  <polyline
-                    points={distributionData.map((p, i) => 
-                      `${(p.x / 10) * 100},${100 - (p.y * 10)}`
-                    ).join(' ')}
-                    fill="none"
-                    stroke="hsl(var(--cyan))"
-                    strokeWidth="1"
-                  />
+                  {/* Gradient fill under curve */}
+                  <defs>
+                    <linearGradient id="curveGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
+                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.05" />
+                    </linearGradient>
+                  </defs>
+                  
+                  {/* Fill under curve */}
+                  {distributionData.length > 0 && (
+                    <polygon
+                      points={`
+                        0,100 
+                        ${distributionData.map((p, i) => {
+                          const minX = distributionData[0].x;
+                          const maxX = distributionData[distributionData.length - 1].x;
+                          const xPos = ((p.x - minX) / (maxX - minX)) * 100;
+                          return `${xPos},${100 - (p.y * 10)}`;
+                        }).join(' ')} 
+                        100,100
+                      `}
+                      fill="url(#curveGradient)"
+                      opacity="0.5"
+                    />
+                  )}
+                  
+                  {/* Bell curve - thicker stroke */}
+                  {distributionData.length > 0 && (
+                    <polyline
+                      points={distributionData.map((p, i) => {
+                        const minX = distributionData[0].x;
+                        const maxX = distributionData[distributionData.length - 1].x;
+                        const xPos = ((p.x - minX) / (maxX - minX)) * 100;
+                        return `${xPos},${100 - (p.y * 10)}`;
+                      }).join(' ')}
+                      fill="none"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  )}
                   
                   {/* User's score marker */}
                   <line
@@ -1003,58 +1137,121 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                     y1="0"
                     x2={scorePosition}
                     y2="100"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth="0.5"
-                    strokeDasharray="2,2"
+                    stroke="hsl(var(--cyan))"
+                    strokeWidth="1"
+                    strokeDasharray="3,3"
+                    opacity="0.8"
                   />
                   <circle
                     cx={scorePosition}
-                    cy={100 - (distributionData.find(p => Math.abs((p.x / 10) * 100 - scorePosition) < 5)?.y || 5) * 10}
-                    r="1.5"
-                    fill="hsl(var(--primary))"
+                    cy={100 - (metric.score * 10)}
+                    r="2"
+                    fill="hsl(var(--cyan))"
+                    stroke="white"
+                    strokeWidth="0.5"
                   />
                   
                   {/* User value label */}
                   <rect
-                    x={Math.max(0, Math.min(80, scorePosition - 10))}
-                    y="45"
-                    width="20"
+                    x={Math.max(2, Math.min(75, scorePosition - 12))}
+                    y={Math.max(5, 100 - (metric.score * 10) - 10)}
+                    width="24"
                     height="8"
-                    fill="hsl(var(--primary))"
-                    rx="1"
+                    fill="hsl(var(--cyan))"
+                    rx="2"
+                    opacity="0.95"
                   />
                   <text
-                    x={Math.max(10, Math.min(90, scorePosition))}
-                    y="50"
-                    fontSize="4"
+                    x={Math.max(14, Math.min(87, scorePosition))}
+                    y={Math.max(10, 100 - (metric.score * 10) - 6)}
+                    fontSize="3.5"
                     fill="white"
                     textAnchor="middle"
                     dominantBaseline="middle"
+                    fontWeight="bold"
                   >
-                    Your Value: {metric.value}
+                    {metric.value}
                   </text>
+                  
+                  {/* Hover point indicator */}
+                  {hoverPoint && (
+                    <>
+                      <line
+                        x1={hoverPoint.x}
+                        y1="0"
+                        x2={hoverPoint.x}
+                        y2="100"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth="0.5"
+                        strokeDasharray="2,2"
+                        opacity="0.6"
+                      />
+                      <circle
+                        cx={hoverPoint.x}
+                        cy={hoverPoint.y}
+                        r="2"
+                        fill="hsl(var(--primary))"
+                        stroke="white"
+                        strokeWidth="0.5"
+                      />
+                      {/* Hover tooltip */}
+                      <rect
+                        x={Math.max(2, Math.min(65, hoverPoint.x - 17))}
+                        y={Math.max(5, hoverPoint.y - 12)}
+                        width="34"
+                        height="10"
+                        fill="hsl(var(--background))"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth="0.5"
+                        rx="2"
+                        opacity="0.95"
+                      />
+                      <text
+                        x={Math.max(19, Math.min(82, hoverPoint.x))}
+                        y={Math.max(10, hoverPoint.y - 7.5)}
+                        fontSize="3"
+                        fill="hsl(var(--primary))"
+                        textAnchor="middle"
+                        fontWeight="bold"
+                      >
+                        {hoverPoint.value}
+                      </text>
+                      <text
+                        x={Math.max(19, Math.min(82, hoverPoint.x))}
+                        y={Math.max(13, hoverPoint.y - 4.5)}
+                        fontSize="2.5"
+                        fill="hsl(var(--muted-foreground))"
+                        textAnchor="middle"
+                      >
+                        {hoverPoint.score.toFixed(1)} pts
+                      </text>
+                    </>
+                  )}
                 </svg>
                 
                 {/* X-axis labels */}
-                <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-xs text-muted-foreground">
-                  <span>19.00</span>
-                  <span>25.00</span>
-                  <span>30.00</span>
-                  <span>35.00</span>
-                  <span>40.00</span>
-                  <span>43.00</span>
+                <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-xs text-muted-foreground px-1">
+                  {distributionData.length > 0 && (
+                    <>
+                      <span>{distributionData[0].value}</span>
+                      <span>{distributionData[Math.floor(distributionData.length * 0.25)].value}</span>
+                      <span>{distributionData[Math.floor(distributionData.length * 0.5)].value}</span>
+                      <span>{distributionData[Math.floor(distributionData.length * 0.75)].value}</span>
+                      <span>{distributionData[distributionData.length - 1].value}</span>
+                    </>
+                  )}
                 </div>
                 
                 {/* Y-axis label */}
                 <div className="absolute -left-16 top-0 bottom-0 flex items-center">
                   <span className="text-xs text-muted-foreground transform -rotate-90 whitespace-nowrap">
-                    Score (1-10 based on Overall)
+                    Score (1-10)
                   </span>
                 </div>
               </div>
               
               <div className="text-center text-xs text-muted-foreground mt-8">
-                Top Third (%)
+                {metric.title}
               </div>
               
               {/* Score info box */}
