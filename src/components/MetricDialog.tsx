@@ -266,13 +266,13 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
           {/* Image with Measurement Lines */}
           <div className="bg-background/50 p-6 rounded-lg border border-cyan/30">
             <p className="text-sm text-muted-foreground mb-4">Your Measurement Visualization</p>
-            <div className="relative w-full max-w-sm mx-auto rounded-lg overflow-hidden">
+            <div className="relative w-full max-w-xs mx-auto rounded-lg overflow-hidden">
               {displayImage && (
                 <>
                   <img 
                     src={displayImage} 
                     alt="Face measurement" 
-                    className="w-full h-auto object-contain"
+                    className="w-full h-auto object-contain max-h-96"
                   />
                   <svg className="absolute inset-0 w-full h-full pointer-events-none">
                     {renderMeasurementLines()}

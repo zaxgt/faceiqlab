@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { calculateMetrics } from "@/utils/facialAnalysis";
 interface AnalysisPanelProps {
   profileImage: string | null;
   frontImage: string | null;
@@ -114,33 +115,28 @@ const AnalysisPanel = ({
   const [landmarks, setLandmarks] = useState<any>(null);
   useEffect(() => {
     const analyzeImages = async () => {
+      if (!frontImage) return;
+      
       setIsAnalyzing(true);
       try {
-        const {
-          data,
-          error
-        } = await supabase.functions.invoke('analyze-face', {
-          body: {
-            frontImage,
-            profileImage
-          }
-        });
-        if (error) throw error;
-        setFaceDetected(data.faceDetected);
-        setLandmarks(data.landmarks);
+        const result = await calculateMetrics(frontImage, profileImage);
+        
+        setFaceDetected(result.faceDetected);
+        setLandmarks(result.landmarks);
 
-        // Transform the API response into the metrics array
+        // Transform the result into the metrics array
         const analyzedMetrics = metricDefinitions.map(def => ({
           title: def.title,
-          value: data.metrics[def.key].value,
+          value: result.metrics[def.key].value,
           ideal: def.ideal,
-          score: data.metrics[def.key].score,
+          score: result.metrics[def.key].score,
           color: def.color,
           description: def.description,
           key: def.key
         }));
         setMetrics(analyzedMetrics);
-        if (!data.faceDetected) {
+        
+        if (!result.faceDetected) {
           toast.error("No face detected in the images. All scores set to 0.");
         } else {
           toast.success("Facial analysis complete!");
