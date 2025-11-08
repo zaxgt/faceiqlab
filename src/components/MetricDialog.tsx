@@ -110,11 +110,8 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
       case "nasalTipAngle":
       case "nasofrontalAngle":
       case "nasolabialAngle":
-        // Profile nose area
-        return {
-          transform: 'scale(2)',
-          transformOrigin: 'center 45%'
-        };
+        // Profile metrics - no zoom (show full image)
+        return {};
       
       default:
         return {
