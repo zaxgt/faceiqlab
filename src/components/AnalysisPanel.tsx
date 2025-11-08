@@ -58,6 +58,96 @@ const metricDefinitions = [{
   ideal: "0.80-3.80×",
   color: "magenta",
   description: "This compares chin height to philtrum height. Proper ratio creates balanced lower third proportions."
+}, {
+  key: "topThird",
+  title: "Top Third (Forehead)",
+  ideal: "30-35%",
+  color: "cyan",
+  description: "The top third measures your forehead height as a percentage of total face height. Ideally this should be around 30-35% for balanced facial proportions."
+}, {
+  key: "middleThird",
+  title: "Middle Third (Midface)",
+  ideal: "30-35%",
+  color: "magenta",
+  description: "The middle third measures from eyebrow line to nose bottom. This should be around 30-35% of your total face height for ideal harmony."
+}, {
+  key: "gonialAngle",
+  title: "Gonial Angle",
+  ideal: "120-130°",
+  color: "cyan",
+  description: "The gonial angle defines your jawline sharpness. Angles within 120-130° create the most defined, masculine jaw structure."
+}, {
+  key: "eyeToEyeSeparation",
+  title: "Eye-to-Eye Separation",
+  ideal: "0.42-0.47",
+  color: "cyan",
+  description: "This ratio compares pupil-to-pupil distance to face width at eye level. An ideal ratio of 0.42-0.47 indicates harmonious eye spacing relative to face width."
+}, {
+  key: "cantalTilt",
+  title: "Cantal Tilt",
+  ideal: "5-8°",
+  color: "magenta",
+  description: "Cantal tilt is the angle of your outer eye corners. A positive tilt of 5-8° creates the most attractive, youthful eye shape."
+}, {
+  key: "eyebrowTilt",
+  title: "Eyebrow Tilt",
+  ideal: "2-5°",
+  color: "magenta",
+  description: "Eyebrow angle defines facial expression and frame. Your tilt is well-positioned within the ideal expressive range."
+}, {
+  key: "yawSymmetry",
+  title: "Yaw Symmetry",
+  ideal: "95-100%",
+  color: "cyan",
+  description: "Yaw symmetry measures how centered and balanced your face appears. Higher percentages indicate exceptional facial alignment."
+}, {
+  key: "nasalProjection",
+  title: "Nasal Projection",
+  ideal: "12-18mm",
+  color: "cyan",
+  description: "Nasal projection measures how far your nose extends from your face. Your measurement shows excellent dimensional balance."
+}, {
+  key: "nasalTipAngle",
+  title: "Nasal Tip Angle",
+  ideal: "95-115°",
+  color: "magenta",
+  description: "The nasal tip angle affects the overall nose profile. Angles within 95-115° are considered most aesthetically refined."
+}, {
+  key: "nasofrontalAngle",
+  title: "Nasofrontal Angle",
+  ideal: "115-135°",
+  color: "cyan",
+  description: "This angle measures the transition from forehead to nose bridge. Your measurement indicates perfect upper face harmony."
+}, {
+  key: "nasolabialAngle",
+  title: "Nasolabial Angle",
+  ideal: "90-120°",
+  color: "magenta",
+  description: "The nasolabial angle defines the curvature between nose and upper lip. Your angle creates excellent facial flow."
+}, {
+  key: "facialConvexityGlabella",
+  title: "Facial Convexity (Glabella)",
+  ideal: "165-175°",
+  color: "cyan",
+  description: "Measures the forehead-to-midface curvature. Your measurement shows strong forward projection and balanced profile."
+}, {
+  key: "facialConvexityNasion",
+  title: "Facial Convexity (Nasion)",
+  ideal: "160-170°",
+  color: "magenta",
+  description: "This measures midface-to-nose harmony. Your convexity indicates excellent proportional smoothness."
+}, {
+  key: "totalFacialConvexity",
+  title: "Total Facial Convexity",
+  ideal: "165-175°",
+  color: "cyan",
+  description: "Overall facial profile curvature. Your measurement demonstrates strong dimensional proportionality."
+}, {
+  key: "nasalHeightToWidthRatio",
+  title: "Nasal Height-to-Width Ratio",
+  ideal: "1.00-1.20",
+  color: "magenta",
+  description: "Defines nose balance from front view. Your ratio shows well-proportioned nasal dimensions."
 }];
 const AnalysisPanel = ({
   profileImage,
