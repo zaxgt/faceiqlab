@@ -143,6 +143,38 @@ function scoreMetric(value: number, idealMin: number, idealMax: number, maxScore
   return Math.max(0.1, Math.min(maxScore, Math.round(score * 10) / 10)); // Minimum 0.1 score
 }
 
+function scoreNoseToMouthRatio(value: number, maxScore: number = 10): number {
+  const idealMin = 1.2;
+  const idealMax = 1.35;
+  const peakPoint = 1.3; // Peak of the curve
+  
+  // Within ideal range but before peak = perfect score
+  if (value >= idealMin && value <= peakPoint) {
+    return maxScore;
+  }
+  
+  // Between peak and idealMax = slight drop
+  if (value > peakPoint && value <= idealMax) {
+    const distanceFromPeak = value - peakPoint;
+    const rangeAfterPeak = idealMax - peakPoint;
+    const dropFactor = distanceFromPeak / rangeAfterPeak;
+    return maxScore * (1 - dropFactor * 0.15); // 15% drop by idealMax
+  }
+  
+  // Below idealMin = sharp drop
+  if (value < idealMin) {
+    const deviation = idealMin - value;
+    const score = maxScore * Math.exp(-2.0 * deviation);
+    return Math.max(0.1, score);
+  }
+  
+  // Above idealMax = gradual drop (slower decay)
+  const deviation = value - idealMax;
+  const score = maxScore * 0.85 * Math.exp(-0.8 * deviation); // Start at 85% of max, slower decay
+  
+  return Math.max(0.1, Math.min(maxScore, Math.round(score * 10) / 10));
+}
+
 export async function calculateMetrics(frontImageUrl: string, profileImageUrl: string | null) {
   const frontAnalysis = await analyzeFace(frontImageUrl, false);
   const profileAnalysis = profileImageUrl ? await analyzeFace(profileImageUrl, true) : null;
@@ -279,7 +311,7 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
       },
       noseToMouthRatio: { 
         value: noseToMouthRatio.toFixed(2), 
-        score: scoreMetric(noseToMouthRatio, 1.30, 1.40) 
+        score: scoreNoseToMouthRatio(noseToMouthRatio) 
       },
       eyeToEyeSeparation: { 
         value: eyeToEyeSeparation.toFixed(2), 

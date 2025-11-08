@@ -43,7 +43,7 @@ const metricDefinitions = [{
 }, {
   key: "noseToMouthRatio",
   title: "Mouth to Nose",
-  ideal: "1.17-1.74×",
+  ideal: "1.20-1.35×",
   color: "magenta",
   description: "This ratio compares mouth width to nose width. Optimal ratio creates balanced mid-to-lower face proportions."
 }, {
