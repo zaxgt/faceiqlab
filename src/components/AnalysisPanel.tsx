@@ -1,11 +1,13 @@
 import MetricBar from "@/components/MetricBar";
 import MetricDialog from "@/components/MetricDialog";
+import TierRatingCard from "@/components/TierRatingCard";
 import { Star, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { calculateMetrics } from "@/utils/facialAnalysis";
+import { calculateTierRating } from "@/utils/tierRating";
 interface AnalysisPanelProps {
   profileImage: string | null;
   frontImage: string | null;
@@ -219,6 +221,7 @@ const AnalysisPanel = ({
     }
   };
   const overallScore = metrics.length > 0 ? (metrics.reduce((sum, m) => sum + m.score, 0) / metrics.length).toFixed(1) : "0.0";
+  const tierRating = calculateTierRating(parseFloat(overallScore));
 
   // Get symmetry from yawSymmetry metric
   const symmetryMetric = metrics.find(m => m.key === "yawSymmetry");
@@ -268,10 +271,13 @@ const AnalysisPanel = ({
           </div>
         </div>
 
+        {/* Tier Rating Card */}
+        <div className="mt-16 animate-slide-up" style={{ animationDelay: "0.8s" }}>
+          <TierRatingCard tierRating={tierRating} overallScore={overallScore} />
+        </div>
+
         {/* Overall Ratings */}
-        <div className="mt-16 space-y-8 animate-slide-up" style={{
-        animationDelay: "0.8s"
-      }}>
+        <div className="mt-8 space-y-8">
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-card border border-cyan/30 rounded-lg p-6 text-center hover:glow-subtle transition-all">
               <p className="text-sm text-muted-foreground mb-2">Overall Balance</p>
