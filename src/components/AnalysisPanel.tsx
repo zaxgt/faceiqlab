@@ -29,12 +29,6 @@ const metricDefinitions = [{
   color: "cyan",
   description: "The lower third measures from nose bottom to chin. Balanced proportion creates strong, harmonious lower face structure."
 }, {
-  key: "eyeSeparationRatio",
-  title: "Eye Separation Ratio",
-  ideal: "38.40-53.60%",
-  color: "magenta",
-  description: "This measures inner eye distance as a percentage of face width. Proper spacing creates balanced facial harmony."
-}, {
   key: "eyesApartRatio",
   title: "Eyes Apart",
   ideal: "0.65-1.26×",
