@@ -128,6 +128,7 @@ const AnalysisPanel = ({
   const [metrics, setMetrics] = useState<any[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(true);
   const [faceDetected, setFaceDetected] = useState(true);
+  const [landmarks, setLandmarks] = useState<any>(null);
 
   useEffect(() => {
     const analyzeImages = async () => {
@@ -143,6 +144,7 @@ const AnalysisPanel = ({
         if (error) throw error;
 
         setFaceDetected(data.faceDetected);
+        setLandmarks(data.landmarks);
         
         // Transform the API response into the metrics array
         const analyzedMetrics = metricDefinitions.map(def => ({
@@ -151,7 +153,8 @@ const AnalysisPanel = ({
           ideal: def.ideal,
           score: data.metrics[def.key].score,
           color: def.color,
-          description: def.description
+          description: def.description,
+          key: def.key
         }));
 
         setMetrics(analyzedMetrics);
@@ -172,7 +175,8 @@ const AnalysisPanel = ({
           ideal: def.ideal,
           score: 0,
           color: def.color,
-          description: def.description
+          description: def.description,
+          key: def.key
         }));
         setMetrics(zeroMetrics);
         setFaceDetected(false);
@@ -212,6 +216,10 @@ const AnalysisPanel = ({
     ? (metrics.reduce((sum, m) => sum + m.score, 0) / metrics.length).toFixed(1)
     : "0.0";
 
+  // Get symmetry from yawSymmetry metric
+  const symmetryMetric = metrics.find(m => m.key === "yawSymmetry");
+  const symmetryValue = symmetryMetric ? symmetryMetric.value : "0.0%";
+
   if (isAnalyzing) {
     return <div className="min-h-screen px-4 py-12 flex items-center justify-center">
       <div className="text-center space-y-4">
@@ -239,21 +247,46 @@ const AnalysisPanel = ({
         }}>
             <div className="grid grid-cols-2 gap-4">
               {/* Front Image */}
-              {frontImage && <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-magenta/30 glow-subtle">
+              {frontImage && landmarks?.front && <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-magenta/30 glow-subtle">
                   <img src={frontImage} alt="Front view analysis" className="w-full h-full object-cover" />
-                  <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-50">
-                    <line x1="50%" y1="20%" x2="50%" y2="80%" stroke="hsl(var(--cyan))" strokeWidth="2" strokeDasharray="4" />
-                    <line x1="20%" y1="35%" x2="80%" y2="35%" stroke="hsl(var(--magenta))" strokeWidth="2" />
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-70">
+                    <line 
+                      x1={`${landmarks.front.faceCenter.x * 100}%`}
+                      y1="10%"
+                      x2={`${landmarks.front.faceCenter.x * 100}%`}
+                      y2="90%"
+                      stroke="hsl(var(--cyan))" strokeWidth="2" strokeDasharray="4"
+                    />
+                    <line 
+                      x1={`${landmarks.front.eyeLeft.x * 100}%`}
+                      y1={`${landmarks.front.eyeLeft.y * 100}%`}
+                      x2={`${landmarks.front.eyeRight.x * 100}%`}
+                      y2={`${landmarks.front.eyeRight.y * 100}%`}
+                      stroke="hsl(var(--magenta))" strokeWidth="2"
+                    />
+                    <circle cx={`${landmarks.front.noseTip.x * 100}%`} cy={`${landmarks.front.noseTip.y * 100}%`} r="3" fill="hsl(var(--cyan))"/>
                   </svg>
                 </div>}
               
               {/* Profile Image */}
-              {profileImage && <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-cyan/30 glow-subtle">
+              {profileImage && landmarks?.profile && <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-cyan/30 glow-subtle">
                   <img src={profileImage} alt="Profile analysis" className="w-full h-full object-cover" />
-                  <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-50">
-                    <line x1="20%" y1="30%" x2="80%" y2="30%" stroke="hsl(var(--cyan))" strokeWidth="2" />
-                    <line x1="20%" y1="45%" x2="80%" y2="45%" stroke="hsl(var(--magenta))" strokeWidth="2" />
-                    <line x1="20%" y1="60%" x2="80%" y2="60%" stroke="hsl(var(--cyan))" strokeWidth="2" />
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-70">
+                    <line 
+                      x1={`${landmarks.profile.forehead.x * 100}%`}
+                      y1={`${landmarks.profile.forehead.y * 100}%`}
+                      x2={`${landmarks.profile.noseTip.x * 100}%`}
+                      y2={`${landmarks.profile.noseTip.y * 100}%`}
+                      stroke="hsl(var(--cyan))" strokeWidth="2"
+                    />
+                    <line 
+                      x1={`${landmarks.profile.noseTip.x * 100}%`}
+                      y1={`${landmarks.profile.noseTip.y * 100}%`}
+                      x2={`${landmarks.profile.chin.x * 100}%`}
+                      y2={`${landmarks.profile.chin.y * 100}%`}
+                      stroke="hsl(var(--magenta))" strokeWidth="2"
+                    />
+                    <circle cx={`${landmarks.profile.jawAngle.x * 100}%`} cy={`${landmarks.profile.jawAngle.y * 100}%`} r="4" fill="hsl(var(--cyan))"/>
                   </svg>
                 </div>}
             </div>
@@ -288,7 +321,7 @@ const AnalysisPanel = ({
             </div>
             <div className="bg-card border border-cyan/30 rounded-lg p-6 text-center hover:glow-subtle transition-all">
               <p className="text-sm text-muted-foreground mb-2">Symmetry Index</p>
-              <p className="text-4xl font-bold text-cyan">98.2%</p>
+              <p className="text-4xl font-bold text-cyan">{symmetryValue}</p>
             </div>
           </div>
 
@@ -342,7 +375,14 @@ FEEL YOUR BEST AND BE THE BEST</h4>
         </div>
       </footer>
 
-      <MetricDialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} metric={selectedMetric} />
+      <MetricDialog 
+        isOpen={isDialogOpen} 
+        onClose={() => setIsDialogOpen(false)} 
+        metric={selectedMetric}
+        frontImage={frontImage}
+        profileImage={profileImage}
+        landmarks={landmarks}
+      />
     </div>;
 };
 export default AnalysisPanel;

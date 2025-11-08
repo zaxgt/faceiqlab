@@ -24,6 +24,29 @@ serve(async (req) => {
 CRITICAL: You MUST respond with ONLY valid JSON in this exact format, no other text:
 {
   "faceDetected": true/false,
+  "landmarks": {
+    "front": {
+      "faceCenter": {"x": 0.5, "y": 0.5},
+      "eyeLeft": {"x": 0.35, "y": 0.35},
+      "eyeRight": {"x": 0.65, "y": 0.35},
+      "noseTip": {"x": 0.5, "y": 0.5},
+      "noseTop": {"x": 0.5, "y": 0.4},
+      "noseBottom": {"x": 0.5, "y": 0.55},
+      "noseLeft": {"x": 0.45, "y": 0.5},
+      "noseRight": {"x": 0.55, "y": 0.5},
+      "mouthTop": {"x": 0.5, "y": 0.65},
+      "jawLeft": {"x": 0.2, "y": 0.75},
+      "jawRight": {"x": 0.8, "y": 0.75}
+    },
+    "profile": {
+      "forehead": {"x": 0.3, "y": 0.2},
+      "noseTip": {"x": 0.6, "y": 0.5},
+      "noseTop": {"x": 0.4, "y": 0.4},
+      "lipTop": {"x": 0.5, "y": 0.65},
+      "chin": {"x": 0.4, "y": 0.8},
+      "jawAngle": {"x": 0.3, "y": 0.75}
+    }
+  },
   "metrics": {
     "midfaceRatio": { "value": "X.XX", "score": X.X },
     "gonialAngle": { "value": "XXX.X°", "score": X.X },
@@ -42,6 +65,8 @@ CRITICAL: You MUST respond with ONLY valid JSON in this exact format, no other t
     "nasalHeightToWidthRatio": { "value": "X.XX", "score": X.X }
   }
 }
+
+The landmarks should be normalized coordinates (0-1) representing the position of key facial features in each image.
 
 Ideal ranges for scoring (score 0-10):
 - Midface Ratio: 0.95-1.00 (10 points), deduct points as it deviates
@@ -118,6 +143,29 @@ Analyze both images carefully. Be harsh in scoring - only exceptional measuremen
     return new Response(JSON.stringify({ 
       error: error instanceof Error ? error.message : 'Unknown error',
       faceDetected: false,
+      landmarks: {
+        front: {
+          faceCenter: {x: 0.5, y: 0.5},
+          eyeLeft: {x: 0.35, y: 0.35},
+          eyeRight: {x: 0.65, y: 0.35},
+          noseTip: {x: 0.5, y: 0.5},
+          noseTop: {x: 0.5, y: 0.4},
+          noseBottom: {x: 0.5, y: 0.55},
+          noseLeft: {x: 0.45, y: 0.5},
+          noseRight: {x: 0.55, y: 0.5},
+          mouthTop: {x: 0.5, y: 0.65},
+          jawLeft: {x: 0.2, y: 0.75},
+          jawRight: {x: 0.8, y: 0.75}
+        },
+        profile: {
+          forehead: {x: 0.3, y: 0.2},
+          noseTip: {x: 0.6, y: 0.5},
+          noseTop: {x: 0.4, y: 0.4},
+          lipTop: {x: 0.5, y: 0.65},
+          chin: {x: 0.4, y: 0.8},
+          jawAngle: {x: 0.3, y: 0.75}
+        }
+      },
       metrics: {
         midfaceRatio: { value: "0.00", score: 0 },
         gonialAngle: { value: "0.0°", score: 0 },
