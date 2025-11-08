@@ -249,7 +249,7 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
       },
       nasalProjection: { 
         value: `${nasalProjection.toFixed(1)}mm`, 
-        score: profile ? scoreMetric(nasalProjection, 12, 16) : 0 
+        score: profile ? scoreMetric(nasalProjection, 12, 18) : 0 
       },
       nasalTipAngle: { 
         value: `${nasalTipAngle.toFixed(1)}°`, 
