@@ -26,13 +26,21 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
   if (!metric) return null;
 
   // Determine which image to show based on metric type
+  // Front image: things visible from the front
+  // Profile image: things visible from the side (angles, projections, convexity)
   const useFrontImage = [
     "eyeToEyeSeparation", "cantalTilt", "eyebrowTilt", "yawSymmetry", 
     "nasalHeightToWidthRatio", "midfaceRatio"
   ].includes(metric.key);
   
-  const displayImage = useFrontImage ? frontImage : profileImage;
-  const imageLandmarks = useFrontImage ? landmarks?.front : landmarks?.profile;
+  const useProfileImage = [
+    "gonialAngle", "nasalProjection", "nasalTipAngle", "nasofrontalAngle",
+    "nasolabialAngle", "facialConvexityGlabella", "facialConvexityNasion",
+    "totalFacialConvexity", "noseToMouthRatio"
+  ].includes(metric.key);
+  
+  const displayImage = useProfileImage ? profileImage : useFrontImage ? frontImage : null;
+  const imageLandmarks = useProfileImage ? landmarks?.profile : useFrontImage ? landmarks?.front : null;
 
   // Function to render measurement lines based on metric type
   const renderMeasurementLines = () => {
@@ -258,13 +266,13 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
           {/* Image with Measurement Lines */}
           <div className="bg-background/50 p-6 rounded-lg border border-cyan/30">
             <p className="text-sm text-muted-foreground mb-4">Your Measurement Visualization</p>
-            <div className="relative aspect-[3/4] rounded-lg overflow-hidden">
+            <div className="relative w-full max-w-sm mx-auto rounded-lg overflow-hidden">
               {displayImage && (
                 <>
                   <img 
                     src={displayImage} 
                     alt="Face measurement" 
-                    className="w-full h-full object-cover"
+                    className="w-full h-auto object-contain"
                   />
                   <svg className="absolute inset-0 w-full h-full pointer-events-none">
                     {renderMeasurementLines()}

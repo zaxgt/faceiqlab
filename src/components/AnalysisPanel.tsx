@@ -223,23 +223,13 @@ const AnalysisPanel = ({
         }}>
             <div className="grid grid-cols-2 gap-4">
               {/* Front Image */}
-              {frontImage && landmarks?.front && <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-magenta/30 glow-subtle">
+              {frontImage && <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-magenta/30 glow-subtle">
                   <img src={frontImage} alt="Front view analysis" className="w-full h-full object-cover" />
-                  <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-70">
-                    <line x1={`${landmarks.front.faceCenter.x * 100}%`} y1="10%" x2={`${landmarks.front.faceCenter.x * 100}%`} y2="90%" stroke="hsl(var(--cyan))" strokeWidth="2" strokeDasharray="4" />
-                    <line x1={`${landmarks.front.eyeLeft.x * 100}%`} y1={`${landmarks.front.eyeLeft.y * 100}%`} x2={`${landmarks.front.eyeRight.x * 100}%`} y2={`${landmarks.front.eyeRight.y * 100}%`} stroke="hsl(var(--magenta))" strokeWidth="2" />
-                    <circle cx={`${landmarks.front.noseTip.x * 100}%`} cy={`${landmarks.front.noseTip.y * 100}%`} r="3" fill="hsl(var(--cyan))" />
-                  </svg>
                 </div>}
               
               {/* Profile Image */}
-              {profileImage && landmarks?.profile && <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-cyan/30 glow-subtle">
+              {profileImage && <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-cyan/30 glow-subtle">
                   <img src={profileImage} alt="Profile analysis" className="w-full h-full object-cover" />
-                  <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-70">
-                    <line x1={`${landmarks.profile.forehead.x * 100}%`} y1={`${landmarks.profile.forehead.y * 100}%`} x2={`${landmarks.profile.noseTip.x * 100}%`} y2={`${landmarks.profile.noseTip.y * 100}%`} stroke="hsl(var(--cyan))" strokeWidth="2" />
-                    <line x1={`${landmarks.profile.noseTip.x * 100}%`} y1={`${landmarks.profile.noseTip.y * 100}%`} x2={`${landmarks.profile.chin.x * 100}%`} y2={`${landmarks.profile.chin.y * 100}%`} stroke="hsl(var(--magenta))" strokeWidth="2" />
-                    <circle cx={`${landmarks.profile.jawAngle.x * 100}%`} cy={`${landmarks.profile.jawAngle.y * 100}%`} r="4" fill="hsl(var(--cyan))" />
-                  </svg>
                 </div>}
             </div>
           </div>
