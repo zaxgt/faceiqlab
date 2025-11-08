@@ -327,6 +327,10 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
         const rightEyeInnerX = (imageLandmarks.eyeRight.x - 0.06);
         const rightEyeOuterX = (imageLandmarks.eyeRight.x + 0.06);
         
+        // Calculate distance between eyes to determine if labels will overlap
+        const eyeDistance = Math.abs(imageLandmarks.eyeRight.x - imageLandmarks.eyeLeft.x);
+        const showBothLabels = eyeDistance > 0.25; // Show both labels only if eyes are far enough apart
+        
         return (
           <>
             {/* Left eye canthal line - bright cyan/blue */}
@@ -351,47 +355,75 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
               strokeLinecap="round"
             />
             
-            {/* Left eye angle label with background */}
-            <rect
-              x={`${(leftEyeInnerX - 0.02) * 100}%`}
-              y={`${(imageLandmarks.eyeLeft.y + 0.05) * 100}%`}
-              width="12%"
-              height="7%"
-              fill="rgba(0, 212, 255, 0.9)"
-              rx="4"
-            />
-            <text
-              x={`${(leftEyeInnerX + 0.04) * 100}%`}
-              y={`${(imageLandmarks.eyeLeft.y + 0.09) * 100}%`}
-              fill="white"
-              fontSize="16"
-              fontWeight="bold"
-              textAnchor="middle"
-              className="drop-shadow-lg"
-            >
-              {Math.abs(parseFloat(metric.value)).toFixed(1)}°
-            </text>
-            
-            {/* Right eye angle label with background */}
-            <rect
-              x={`${(rightEyeOuterX - 0.10) * 100}%`}
-              y={`${(imageLandmarks.eyeRight.y + 0.05) * 100}%`}
-              width="12%"
-              height="7%"
-              fill="rgba(0, 212, 255, 0.9)"
-              rx="4"
-            />
-            <text
-              x={`${(rightEyeOuterX - 0.04) * 100}%`}
-              y={`${(imageLandmarks.eyeRight.y + 0.09) * 100}%`}
-              fill="white"
-              fontSize="16"
-              fontWeight="bold"
-              textAnchor="middle"
-              className="drop-shadow-lg"
-            >
-              {Math.abs(parseFloat(metric.value)).toFixed(1)}°
-            </text>
+            {/* Show single centered label if eyes are close, otherwise show both */}
+            {showBothLabels ? (
+              <>
+                {/* Left eye angle label with background */}
+                <rect
+                  x={`${(leftEyeInnerX - 0.02) * 100}%`}
+                  y={`${(imageLandmarks.eyeLeft.y + 0.05) * 100}%`}
+                  width="12%"
+                  height="7%"
+                  fill="rgba(0, 212, 255, 0.9)"
+                  rx="4"
+                />
+                <text
+                  x={`${(leftEyeInnerX + 0.04) * 100}%`}
+                  y={`${(imageLandmarks.eyeLeft.y + 0.09) * 100}%`}
+                  fill="white"
+                  fontSize="16"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                  className="drop-shadow-lg"
+                >
+                  {Math.abs(parseFloat(metric.value)).toFixed(1)}°
+                </text>
+                
+                {/* Right eye angle label with background */}
+                <rect
+                  x={`${(rightEyeOuterX - 0.10) * 100}%`}
+                  y={`${(imageLandmarks.eyeRight.y + 0.05) * 100}%`}
+                  width="12%"
+                  height="7%"
+                  fill="rgba(0, 212, 255, 0.9)"
+                  rx="4"
+                />
+                <text
+                  x={`${(rightEyeOuterX - 0.04) * 100}%`}
+                  y={`${(imageLandmarks.eyeRight.y + 0.09) * 100}%`}
+                  fill="white"
+                  fontSize="16"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                  className="drop-shadow-lg"
+                >
+                  {Math.abs(parseFloat(metric.value)).toFixed(1)}°
+                </text>
+              </>
+            ) : (
+              <>
+                {/* Single centered label */}
+                <rect
+                  x={`${((leftEyeInnerX + rightEyeOuterX) / 2 - 0.06) * 100}%`}
+                  y={`${(imageLandmarks.eyeLeft.y + 0.05) * 100}%`}
+                  width="12%"
+                  height="7%"
+                  fill="rgba(0, 212, 255, 0.9)"
+                  rx="4"
+                />
+                <text
+                  x={`${((leftEyeInnerX + rightEyeOuterX) / 2) * 100}%`}
+                  y={`${(imageLandmarks.eyeLeft.y + 0.09) * 100}%`}
+                  fill="white"
+                  fontSize="16"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                  className="drop-shadow-lg"
+                >
+                  {Math.abs(parseFloat(metric.value)).toFixed(1)}°
+                </text>
+              </>
+            )}
           </>
         );
 
@@ -434,16 +466,29 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
               strokeWidth="3"
             />
             <circle cx={`${imageLandmarks.noseTip.x * 100}%`} cy={`${imageLandmarks.noseTip.y * 100}%`} r="5" fill="#00D4FF"/>
-            <text
-              x={`${((imageLandmarks.forehead?.x || 0.3) + imageLandmarks.noseTip.x) / 2 * 100}%`}
-              y={`${(imageLandmarks.noseTip.y - 0.03) * 100}%`}
-              fill="#00D4FF"
-              fontSize="14"
-              fontWeight="bold"
-              textAnchor="middle"
-            >
-              {metric.value}
-            </text>
+            {/* Only show label if there's enough space */}
+            {imageLandmarks.noseTip.x - (imageLandmarks.forehead?.x || 0.3) > 0.08 && (
+              <>
+                <rect
+                  x={`${(((imageLandmarks.forehead?.x || 0.3) + imageLandmarks.noseTip.x) / 2 - 0.05) * 100}%`}
+                  y={`${(imageLandmarks.noseTip.y - 0.05) * 100}%`}
+                  width="10%"
+                  height="4%"
+                  fill="rgba(0, 212, 255, 0.8)"
+                  rx="3"
+                />
+                <text
+                  x={`${((imageLandmarks.forehead?.x || 0.3) + imageLandmarks.noseTip.x) / 2 * 100}%`}
+                  y={`${(imageLandmarks.noseTip.y - 0.025) * 100}%`}
+                  fill="white"
+                  fontSize="12"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  {metric.value}
+                </text>
+              </>
+            )}
           </>
         );
 
@@ -478,12 +523,21 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
               strokeWidth="2"
             />
             <circle cx={`${imageLandmarks.noseTip.x * 100}%`} cy={`${imageLandmarks.noseTip.y * 100}%`} r="5" fill="#FFFFFF"/>
+            <rect
+              x={`${(imageLandmarks.noseTip.x + 0.02) * 100}%`}
+              y={`${(imageLandmarks.noseTip.y - 0.025) * 100}%`}
+              width="10%"
+              height="5%"
+              fill="rgba(255, 255, 0, 0.9)"
+              rx="3"
+            />
             <text
-              x={`${(imageLandmarks.noseTip.x + 0.05) * 100}%`}
-              y={`${imageLandmarks.noseTip.y * 100}%`}
-              fill="#FFFF00"
-              fontSize="16"
+              x={`${(imageLandmarks.noseTip.x + 0.07) * 100}%`}
+              y={`${(imageLandmarks.noseTip.y + 0.005) * 100}%`}
+              fill="black"
+              fontSize="14"
               fontWeight="bold"
+              textAnchor="middle"
             >
               {metric.value}
             </text>
@@ -521,12 +575,21 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
               strokeWidth="2"
             />
             <circle cx={`${imageLandmarks.noseTop.x * 100}%`} cy={`${imageLandmarks.noseTop.y * 100}%`} r="5" fill="#FFFFFF"/>
+            <rect
+              x={`${(imageLandmarks.noseTop.x - 0.12) * 100}%`}
+              y={`${(imageLandmarks.noseTop.y + 0.02) * 100}%`}
+              width="10%"
+              height="5%"
+              fill="rgba(255, 255, 0, 0.9)"
+              rx="3"
+            />
             <text
-              x={`${(imageLandmarks.noseTop.x - 0.05) * 100}%`}
-              y={`${(imageLandmarks.noseTop.y + 0.05) * 100}%`}
-              fill="#FFFF00"
-              fontSize="16"
+              x={`${(imageLandmarks.noseTop.x - 0.07) * 100}%`}
+              y={`${(imageLandmarks.noseTop.y + 0.052) * 100}%`}
+              fill="black"
+              fontSize="14"
               fontWeight="bold"
+              textAnchor="middle"
             >
               {metric.value}
             </text>
@@ -564,12 +627,21 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
               strokeWidth="2"
             />
             <circle cx={`${(imageLandmarks.noseTip.x - 0.04) * 100}%`} cy={`${(imageLandmarks.noseTip.y + 0.04) * 100}%`} r="5" fill="#FFFFFF"/>
+            <rect
+              x={`${(imageLandmarks.noseTip.x - 0.14) * 100}%`}
+              y={`${(imageLandmarks.noseTip.y + 0.02) * 100}%`}
+              width="10%"
+              height="5%"
+              fill="rgba(255, 255, 0, 0.9)"
+              rx="3"
+            />
             <text
-              x={`${(imageLandmarks.noseTip.x - 0.08) * 100}%`}
-              y={`${(imageLandmarks.noseTip.y + 0.04) * 100}%`}
-              fill="#FFFF00"
-              fontSize="16"
+              x={`${(imageLandmarks.noseTip.x - 0.09) * 100}%`}
+              y={`${(imageLandmarks.noseTip.y + 0.052) * 100}%`}
+              fill="black"
+              fontSize="14"
               fontWeight="bold"
+              textAnchor="middle"
             >
               {metric.value}
             </text>
