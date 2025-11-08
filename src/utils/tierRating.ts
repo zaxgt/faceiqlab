@@ -16,39 +16,46 @@ export const calculateTierRating = (overallScore: number): TierRating => {
   } else if (overallScore >= 9) {
     return {
       tier: "CHAD",
-      percentile: "Top 1%",
+      percentile: "Top 0.1%",
       description: "Elite facial aesthetics. Outstanding proportions.",
       color: "from-cyan via-blue-500 to-indigo-600"
     };
-  } else if (overallScore >= 8.5) {
+  } else if (overallScore >= 8) {
     return {
       tier: "CHAD LITE",
-      percentile: "Top 5%",
+      percentile: "Top 1%",
       description: "Excellent facial structure with strong appeal.",
       color: "from-cyan/80 via-blue-400 to-indigo-500"
     };
-  } else if (overallScore >= 7.5) {
+  } else if (overallScore >= 7) {
+    return {
+      tier: "MODEL TIER",
+      percentile: "Top 5%",
+      description: "Model level aesthetics. Professional appeal.",
+      color: "from-purple-400 via-pink-500 to-rose-600"
+    };
+  } else if (overallScore >= 6) {
     return {
       tier: "HTN",
       percentile: "Top 20%",
-      description: "High tier normie. Above average aesthetics.",
+      description: "High tier normie. Really good looking.",
       color: "from-green-400 via-emerald-500 to-teal-600"
     };
-  } else if (overallScore >= 6) {
+  } else if (overallScore >= 5) {
     return {
       tier: "MTN",
       percentile: "50th Percentile",
       description: "Mid tier normie. Average facial proportions.",
       color: "from-yellow-500 via-amber-500 to-orange-500"
     };
-  } else if (overallScore >= 5) {
+  } else if (overallScore >= 4) {
     return {
       tier: "LTN",
       percentile: "30th Percentile",
       description: "Low tier normie. Below average features.",
       color: "from-orange-500 via-orange-600 to-red-500"
     };
-  } else if (overallScore >= 4) {
+  } else if (overallScore >= 3) {
     return {
       tier: "SUB 5",
       percentile: "10th Percentile",
