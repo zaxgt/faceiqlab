@@ -32,7 +32,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
   // Front image: things visible from the front
   // Profile image: things visible from the side (angles, projections, convexity)
   const useFrontImage = [
-    "cantalTilt", "eyebrowTilt", "earFlare", "yawSymmetry", 
+    "cantalTilt", "eyebrowTilt", "yawSymmetry", 
     "nasalHeightToWidthRatio", "topThird", "middleThird", "lowerThird", "noseToMouthRatio",
     "totalFacialWidthToHeightRatio", "bigonialToBizygomaticRatio", "eyeSeparationRatio",
     "eyesApartRatio", "faceWidthToHeightRatio", "chinToPhiltrumRatio"
@@ -60,13 +60,6 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
         const eyeCenterY = ((imageLandmarks.eyeLeft?.y || 0.35) + (imageLandmarks.eyeRight?.y || 0.35)) / 2;
         return {
           transform: `scale(2.5) translate(${(0.5 - eyeCenterX) * 40}%, ${(0.35 - eyeCenterY) * 40}%)`,
-          transformOrigin: 'center center'
-        };
-      
-      case "earFlare":
-        // Full face view for ears
-        return {
-          transform: 'scale(1.1)',
           transformOrigin: 'center center'
         };
       
@@ -343,6 +336,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
         );
 
       case "cantalTilt":
+      case "eyebrowTilt":
         if (!imageLandmarks.eyeLeft || !imageLandmarks.eyeRight) return null;
         const leftEyeInnerX = (imageLandmarks.eyeLeft.x - 0.06);
         const leftEyeOuterX = (imageLandmarks.eyeLeft.x + 0.06);
@@ -446,118 +440,6 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                 </text>
               </>
             )}
-          </>
-        );
-      
-      case "eyebrowTilt":
-        if (!imageLandmarks.eyeLeft || !imageLandmarks.eyeRight) return null;
-        return (
-          <>
-            {/* Left eyebrow line */}
-            <line 
-              x1={`${(imageLandmarks.eyeLeft.x - 0.08) * 100}%`}
-              y1={`${(imageLandmarks.eyeLeft.y - 0.05) * 100}%`}
-              x2={`${(imageLandmarks.eyeLeft.x + 0.04) * 100}%`}
-              y2={`${(imageLandmarks.eyeLeft.y - 0.05) * 100}%`}
-              stroke="#FF00D4" 
-              strokeWidth="4"
-              strokeLinecap="round"
-            />
-            
-            {/* Right eyebrow line */}
-            <line 
-              x1={`${(imageLandmarks.eyeRight.x - 0.04) * 100}%`}
-              y1={`${(imageLandmarks.eyeRight.y - 0.05) * 100}%`}
-              x2={`${(imageLandmarks.eyeRight.x + 0.08) * 100}%`}
-              y2={`${(imageLandmarks.eyeRight.y - 0.05) * 100}%`}
-              stroke="#FF00D4" 
-              strokeWidth="4"
-              strokeLinecap="round"
-            />
-            
-            {/* Center label */}
-            <rect
-              x={`${((imageLandmarks.eyeLeft.x + imageLandmarks.eyeRight.x) / 2 - 0.06) * 100}%`}
-              y={`${(imageLandmarks.eyeLeft.y - 0.12) * 100}%`}
-              width="12%"
-              height="7%"
-              fill="rgba(255, 0, 212, 0.9)"
-              rx="4"
-            />
-            <text
-              x={`${((imageLandmarks.eyeLeft.x + imageLandmarks.eyeRight.x) / 2) * 100}%`}
-              y={`${(imageLandmarks.eyeLeft.y - 0.08) * 100}%`}
-              fill="white"
-              fontSize="16"
-              fontWeight="bold"
-              textAnchor="middle"
-              className="drop-shadow-lg"
-            >
-              {Math.abs(parseFloat(metric.value)).toFixed(1)}°
-            </text>
-          </>
-        );
-      
-      case "earFlare":
-        // Show ear flare angles
-        return (
-          <>
-            {/* Left ear line */}
-            <line 
-              x1={`${(imageLandmarks.eyeLeft.x - 0.15) * 100}%`}
-              y1={`${(imageLandmarks.eyeLeft.y - 0.08) * 100}%`}
-              x2={`${(imageLandmarks.eyeLeft.x - 0.15) * 100}%`}
-              y2={`${(imageLandmarks.eyeLeft.y + 0.15) * 100}%`}
-              stroke="#00D4FF" 
-              strokeWidth="3"
-            />
-            
-            {/* Right ear line */}
-            <line 
-              x1={`${(imageLandmarks.eyeRight.x + 0.15) * 100}%`}
-              y1={`${(imageLandmarks.eyeRight.y - 0.08) * 100}%`}
-              x2={`${(imageLandmarks.eyeRight.x + 0.15) * 100}%`}
-              y2={`${(imageLandmarks.eyeRight.y + 0.15) * 100}%`}
-              stroke="#00D4FF" 
-              strokeWidth="3"
-            />
-            
-            {/* Left ear marker */}
-            <circle 
-              cx={`${(imageLandmarks.eyeLeft.x - 0.15) * 100}%`}
-              cy={`${imageLandmarks.eyeLeft.y * 100}%`}
-              r="5" 
-              fill="#00D4FF"
-            />
-            
-            {/* Right ear marker */}
-            <circle 
-              cx={`${(imageLandmarks.eyeRight.x + 0.15) * 100}%`}
-              cy={`${imageLandmarks.eyeRight.y * 100}%`}
-              r="5" 
-              fill="#00D4FF"
-            />
-            
-            {/* Center label */}
-            <rect
-              x={`${((imageLandmarks.eyeLeft.x + imageLandmarks.eyeRight.x) / 2 - 0.06) * 100}%`}
-              y={`${(imageLandmarks.eyeLeft.y - 0.05) * 100}%`}
-              width="12%"
-              height="7%"
-              fill="rgba(0, 212, 255, 0.9)"
-              rx="4"
-            />
-            <text
-              x={`${((imageLandmarks.eyeLeft.x + imageLandmarks.eyeRight.x) / 2) * 100}%`}
-              y={`${(imageLandmarks.eyeLeft.y - 0.01) * 100}%`}
-              fill="white"
-              fontSize="16"
-              fontWeight="bold"
-              textAnchor="middle"
-              className="drop-shadow-lg"
-            >
-              {Math.abs(parseFloat(metric.value)).toFixed(1)}°
-            </text>
           </>
         );
 
@@ -1177,20 +1059,18 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
             </div>
 
             {/* Score Distribution */}
-            <div className="bg-[#1a1a1a] p-6 rounded-lg border border-cyan/20">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="text-sm font-semibold text-foreground">Score Distribution</h3>
-                  <p className="text-xs text-muted-foreground mt-1">How points are awarded across ratio values</p>
-                </div>
-                <div className="text-right text-xs">
-                  <div className="text-muted-foreground">Hover</div>
-                  <div className="text-cyan font-semibold">{hoverPoint ? `${hoverPoint.score.toFixed(1)} pts` : `${metric.score.toFixed(1)} pts`}</div>
+            <div className="bg-background/50 p-4 rounded-lg border border-border">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-sm font-semibold text-cyan">Score Distribution</h3>
+                <div className="text-right text-xs text-muted-foreground">
+                  <div>Hover</div>
+                  <div className="text-cyan">{metric.ideal}</div>
                 </div>
               </div>
+              <p className="text-xs text-muted-foreground mb-4">How points are awarded across ratio values</p>
               
               {/* Distribution curve */}
-              <div className="relative h-48 bg-[#0a0a0a] rounded-lg border border-border/30 mt-4">
+              <div className="relative h-48 bg-gradient-to-b from-background/95 to-background/80 rounded border border-border/50">
                 <svg 
                   className="w-full h-full cursor-crosshair" 
                   viewBox="0 0 100 100" 
@@ -1206,17 +1086,17 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                       y1={100 - y} 
                       x2="100" 
                       y2={100 - y} 
-                      stroke="#333333" 
-                      strokeWidth="0.3"
-                      opacity="0.4"
+                      stroke="hsl(var(--border))" 
+                      strokeWidth="0.2"
+                      opacity="0.3"
                     />
                   ))}
                   
                   {/* Gradient fill under curve */}
                   <defs>
                     <linearGradient id="curveGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.4" />
-                      <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.05" />
+                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
+                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.05" />
                     </linearGradient>
                   </defs>
                   
@@ -1248,8 +1128,8 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                         return `${xPos},${100 - (p.y * 10)}`;
                       }).join(' ')}
                       fill="none"
-                      stroke="#8B5CF6"
-                      strokeWidth="2.5"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
@@ -1261,40 +1141,40 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                     y1="0"
                     x2={scorePosition}
                     y2="100"
-                    stroke="#00ff88"
-                    strokeWidth="1.5"
-                    strokeDasharray="0"
-                    opacity="1"
+                    stroke="hsl(var(--cyan))"
+                    strokeWidth="1"
+                    strokeDasharray="3,3"
+                    opacity="0.8"
                   />
                   <circle
                     cx={scorePosition}
                     cy={100 - (metric.score * 10)}
-                    r="2.5"
-                    fill="#00ff88"
+                    r="2"
+                    fill="hsl(var(--cyan))"
                     stroke="white"
-                    strokeWidth="1"
+                    strokeWidth="0.5"
                   />
                   
                   {/* User value label */}
                   <rect
-                    x={Math.max(2, Math.min(70, scorePosition - 15))}
-                    y={Math.max(3, 100 - (metric.score * 10) - 12)}
-                    width="30"
-                    height="10"
-                    fill="#00ff88"
+                    x={Math.max(2, Math.min(75, scorePosition - 12))}
+                    y={Math.max(5, 100 - (metric.score * 10) - 10)}
+                    width="24"
+                    height="8"
+                    fill="hsl(var(--cyan))"
                     rx="2"
-                    opacity="1"
+                    opacity="0.95"
                   />
                   <text
-                    x={Math.max(17, Math.min(85, scorePosition))}
-                    y={Math.max(8, 100 - (metric.score * 10) - 7)}
-                    fontSize="4"
-                    fill="black"
+                    x={Math.max(14, Math.min(87, scorePosition))}
+                    y={Math.max(10, 100 - (metric.score * 10) - 6)}
+                    fontSize="3.5"
+                    fill="white"
                     textAnchor="middle"
                     dominantBaseline="middle"
                     fontWeight="bold"
                   >
-                    Your Value: {metric.value}
+                    {metric.value}
                   </text>
                   
                   {/* Hover point indicator */}
@@ -1375,7 +1255,17 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
               </div>
               
               <div className="text-center text-xs text-muted-foreground mt-8">
-                Top Third (%)
+                {metric.title}
+              </div>
+              
+              {/* Score info box */}
+              <div className="mt-4 p-3 bg-background/80 rounded border border-cyan/30">
+                <div className="text-sm text-muted-foreground">
+                  Value: <span className="text-cyan font-semibold">{metric.value}</span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Score: <span className="text-cyan font-semibold">{metric.score.toFixed(2)} points</span>
+                </div>
               </div>
             </div>
           </div>

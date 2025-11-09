@@ -79,15 +79,7 @@ export async function analyzeFace(imageDataUrl: string, isProfile: boolean = fal
     rightCheekbone: 234, // Bizygomatic point
     philtrumTop: 164, // Top of philtrum (under nose)
     philtrumBottom: 13, // Bottom of philtrum (top of upper lip)
-    pronasale: isProfile ? 4 : 1, // Nose tip in profile (actual anterior point on nose)
-    leftEyebrowOuter: 70, // Outer point of left eyebrow
-    rightEyebrowOuter: 300, // Outer point of right eyebrow
-    leftEyebrowInner: 105, // Inner point of left eyebrow
-    rightEyebrowInner: 334, // Inner point of right eyebrow
-    leftEarTop: 127, // Top of left ear
-    leftEarBottom: 234, // Bottom of left ear (jaw point)
-    rightEarTop: 356, // Top of right ear
-    rightEarBottom: 454 // Bottom of right ear (jaw point)
+    pronasale: isProfile ? 4 : 1 // Nose tip in profile (actual anterior point on nose)
   };
   
   // Extract key points
@@ -117,15 +109,7 @@ export async function analyzeFace(imageDataUrl: string, isProfile: boolean = fal
     rightCheekbone: landmarks[indices.rightCheekbone],
     philtrumTop: landmarks[indices.philtrumTop],
     philtrumBottom: landmarks[indices.philtrumBottom],
-    pronasale: landmarks[indices.pronasale], // Nose tip for profile measurements
-    leftEyebrowOuter: landmarks[indices.leftEyebrowOuter],
-    rightEyebrowOuter: landmarks[indices.rightEyebrowOuter],
-    leftEyebrowInner: landmarks[indices.leftEyebrowInner],
-    rightEyebrowInner: landmarks[indices.rightEyebrowInner],
-    leftEarTop: landmarks[indices.leftEarTop],
-    leftEarBottom: landmarks[indices.leftEarBottom],
-    rightEarTop: landmarks[indices.rightEarTop],
-    rightEarBottom: landmarks[indices.rightEarBottom]
+    pronasale: landmarks[indices.pronasale] // Nose tip for profile measurements
   };
   
   // Calculate face center
@@ -243,20 +227,10 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
   // Cantal tilt
   const cantalTiltAngle = Math.atan2(front.rightEye.y - front.leftEye.y, front.rightEye.x - front.leftEye.x) * (180 / Math.PI);
   
-  // Eyebrow tilt (using eyebrow landmarks)
-  const leftEyebrowTilt = Math.atan2(front.leftEyebrowOuter.y - front.leftEyebrowInner.y, front.leftEyebrowOuter.x - front.leftEyebrowInner.x) * (180 / Math.PI);
-  const rightEyebrowTilt = Math.atan2(front.rightEyebrowInner.y - front.rightEyebrowOuter.y, front.rightEyebrowInner.x - front.rightEyebrowOuter.x) * (180 / Math.PI);
-  const eyebrowTiltAngle = (Math.abs(leftEyebrowTilt) + Math.abs(rightEyebrowTilt)) / 2;
-  
   // Yaw symmetry
   const leftDistance = Math.abs(front.leftEye.x - frontAnalysis.faceCenter.x);
   const rightDistance = Math.abs(front.rightEye.x - frontAnalysis.faceCenter.x);
   const yawSymmetry = (1 - Math.abs(leftDistance - rightDistance) / Math.max(leftDistance, rightDistance)) * 100;
-  
-  // Ear flare angle (front view)
-  const leftEarFlareAngle = Math.abs(Math.atan2(front.leftEarTop.y - front.leftEarBottom.y, front.leftEarTop.x - front.leftEarBottom.x) * (180 / Math.PI));
-  const rightEarFlareAngle = Math.abs(Math.atan2(front.rightEarTop.y - front.rightEarBottom.y, front.rightEarTop.x - front.rightEarBottom.x) * (180 / Math.PI));
-  const earFlareAngle = (leftEarFlareAngle + rightEarFlareAngle) / 2;
   
   // Nasal measurements
   const nasalHeight = distance(front.noseTop, front.noseBottom);
@@ -351,12 +325,8 @@ export async function calculateMetrics(frontImageUrl: string, profileImageUrl: s
         score: scoreMetric(Math.abs(cantalTiltAngle), 5, 8) 
       },
       eyebrowTilt: { 
-        value: `${eyebrowTiltAngle.toFixed(1)}°`, 
-        score: scoreMetric(eyebrowTiltAngle, 2, 5) 
-      },
-      earFlare: {
-        value: `${earFlareAngle.toFixed(1)}°`,
-        score: scoreMetric(earFlareAngle, 15, 25)
+        value: `${cantalTiltAngle.toFixed(1)}°`, 
+        score: scoreMetric(Math.abs(cantalTiltAngle), 2, 5) 
       },
       yawSymmetry: { 
         value: `${yawSymmetry.toFixed(1)}%`, 
@@ -431,7 +401,6 @@ function getEmptyMetrics() {
     noseToMouthRatio: { value: "0.00", score: 0 },
     cantalTilt: { value: "0.0°", score: 0 },
     eyebrowTilt: { value: "0.0°", score: 0 },
-    earFlare: { value: "0.0°", score: 0 },
     yawSymmetry: { value: "0.0%", score: 0 },
     nasalProjection: { value: "0.0mm", score: 0 },
     nasalTipAngle: { value: "0.0°", score: 0 },
