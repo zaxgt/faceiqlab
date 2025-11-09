@@ -86,6 +86,12 @@ const metricDefinitions = [{
   color: "magenta",
   description: "Eyebrow angle defines facial expression and frame. Your tilt is well-positioned within the ideal expressive range."
 }, {
+  key: "earFlare",
+  title: "Ear Flare",
+  ideal: "15-25°",
+  color: "cyan",
+  description: "Ear flare measures the angle at which your ears protrude from your head. Moderate flare creates balanced facial harmony."
+}, {
   key: "yawSymmetry",
   title: "Yaw Symmetry",
   ideal: "95-100%",
