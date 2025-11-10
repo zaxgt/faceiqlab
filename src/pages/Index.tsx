@@ -45,19 +45,21 @@ const Index = () => {
       <div className="fixed bottom-4 right-4 w-32 h-12 bg-background z-[9999]" />
 
       {/* 👁 Floating Visitor Counter */}
-      <div
-  className="fixed bottom-4 left-4 bg-neutral-900 text-purple-400 font-mono px-4 py-2 rounded-xl shadow-lg z-[9999]"
-  style={{ opacity: 0.9 }}
->
-  👁 All Time Users: {visits ?? "Loading..."}
-</div>
+      <div className="fixed bottom-4 left-4 z-[9999] flex flex-col items-start space-y-1">
+  {/* Main visitor counter */}
+  <div
+    className="bg-neutral-900 text-purple-400 font-mono px-4 py-2 rounded-xl shadow-lg"
+    style={{ opacity: 0.9 }}
+  >
+    👁 All Time Users: {visits ?? "Loading..."}
+  </div>
 
-{/* Small description under the counter */}
-<div
-  className="fixed bottom-2 left-4 text-neutral-300 text-xs font-sans z-[9999]"
-  style={{ maxWidth: "200px", lineHeight: "1.2" }}
->
-  This data is not tracked by us; it is tracked by a third-party source 6developer.com
+  {/* Small description underneath */}
+  <div
+    className="text-neutral-300 text-xs font-sans max-w-[200px] leading-tight"
+  >
+    This data is not tracked by us; it is tracked by a third-party source 6developer.com
+  </div>
 </div>
 
       {stage === "hero" && <Hero onBegin={handleBegin} />}
