@@ -46,16 +46,6 @@ const Index = () => {
 
       {/* 👁 Floating Visitor Counter */}
       <div className="fixed bottom-4 left-4 z-[9999] flex flex-col items-start space-y-1">
-        <div className="mt-6 flex flex-col items-center">
-  <button
-    onClick={() => navigate("/premium")}
-    className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-xl shadow-lg transition"
-  >
-    🌟 Premium
-  </button>
-  <p className="text-sm text-neutral-400 mt-2">$1/week</p>
-</div>
-
   {/* Main visitor counter */}
   <div
     className="bg-neutral-900 text-purple-400 font-mono px-4 py-2 rounded-xl shadow-lg"
