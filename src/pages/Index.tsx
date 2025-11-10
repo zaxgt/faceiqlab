@@ -28,10 +28,10 @@ const Index = () => {
 
       {/* 👁 Floating Visitor Counter */}
       <div
-        className="fixed bottom-4 left-4 bg-neutral-900 text-green-400 font-mono px-4 py-2 rounded-xl shadow-lg z-[9999]"
+        className="fixed bottom-4 left-4 bg-neutral-900 text-purple-400 font-mono px-4 py-2 rounded-xl shadow-lg z-[9999]"
         style={{ opacity: 0.9 }}
       >
-        👁 Visitors: {visits ?? "Loading..."}
+        👁 All Time Visitors: {visits ?? "Loading..."}
       </div>
 
       {stage === "hero" && <Hero onBegin={handleBegin} />}
