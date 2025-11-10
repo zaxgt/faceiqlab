@@ -4,16 +4,23 @@ import UploadSection from "@/components/UploadSection";
 import AnalysisPanel from "@/components/AnalysisPanel";
 
 const Index = () => {
-  const [stage, setStage] = useState<"hero" | "upload" | "analysis" | "signin" | "checkout" | "dashboard">("hero");
+  const [stage, setStage] = useState<
+    "hero" | "upload" | "analysis" | "signin" | "checkout" | "dashboard"
+  >("hero");
   const [frontImage, setFrontImage] = useState<string | null>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
-  // 👁 Visitor counter state
+  // 👁 Visitor counter
   const [visits, setVisits] = useState<number | null>(null);
 
-  // 🔐 User and Premium states
+  // 🔐 Auth & premium
   const [user, setUser] = useState<string | null>(localStorage.getItem("user"));
-  const [premium, setPremium] = useState<boolean>(localStorage.getItem("premium") === "true");
+  const [premium, setPremium] = useState<boolean>(
+    localStorage.getItem("premium") === "true"
+  );
+
+  // Dropdown
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     const domain = encodeURIComponent(window.location.hostname);
@@ -39,10 +46,8 @@ const Index = () => {
       });
   }, []);
 
-  const handleBegin = () => setStage("upload");
-  const handleAnalyze = () => setStage("analysis");
+  const handleAnalyze = () => setStage("upload");
 
-  // 🪙 Premium button logic
   const handlePremiumClick = () => {
     if (!user) {
       setStage("signin");
@@ -53,21 +58,18 @@ const Index = () => {
     }
   };
 
-  // 🔑 Sign in handler
   const handleSignIn = (username: string) => {
     localStorage.setItem("user", username);
     setUser(username);
     setStage("checkout");
   };
 
-  // 💰 Simulate payment
   const handlePayment = () => {
     localStorage.setItem("premium", "true");
     setPremium(true);
     setStage("dashboard");
   };
 
-  // 📊 Sign out
   const handleSignOut = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("premium");
@@ -94,18 +96,41 @@ const Index = () => {
         </div>
       </div>
 
-      {/* 🧠 Stage Rendering */}
+      {/* 🧠 HERO + dropdown button */}
       {stage === "hero" && (
         <div className="flex flex-col items-center justify-center min-h-screen">
-          <Hero onBegin={handleBegin} />
-          <div className="mt-6 flex flex-col items-center">
-            <p className="text-gray-400 text-sm">Premium — $1 / week</p>
+          <Hero onBegin={() => {}} />
+
+          <div className="relative mt-6">
             <button
-              onClick={handlePremiumClick}
-              className="mt-2 px-5 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 transition"
+              onClick={() => setShowMenu(!showMenu)}
+              className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg shadow-lg text-lg font-medium"
             >
-              Premium
+              Choose Option ▾
             </button>
+
+            {showMenu && (
+              <div className="absolute top-full left-0 mt-2 bg-neutral-900 border border-neutral-700 rounded-xl shadow-xl w-56">
+                <button
+                  onClick={() => {
+                    setShowMenu(false);
+                    handleAnalyze();
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-neutral-800 rounded-t-xl"
+                >
+                  🧠 Analyze Face
+                </button>
+                <button
+                  onClick={() => {
+                    setShowMenu(false);
+                    handlePremiumClick();
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-neutral-800 rounded-b-xl"
+                >
+                  💎 Premium Dashboard
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -116,7 +141,7 @@ const Index = () => {
           profileImage={profileImage}
           onFrontImageChange={setFrontImage}
           onProfileImageChange={setProfileImage}
-          onAnalyze={handleAnalyze}
+          onAnalyze={() => setStage("analysis")}
         />
       )}
 
@@ -124,7 +149,7 @@ const Index = () => {
         <AnalysisPanel profileImage={profileImage} frontImage={frontImage} />
       )}
 
-      {/* 🔑 Sign-in screen */}
+      {/* 🔑 Sign In */}
       {stage === "signin" && (
         <div className="flex flex-col items-center justify-center min-h-screen">
           <h2 className="text-2xl mb-4">Sign In</h2>
@@ -148,7 +173,7 @@ const Index = () => {
         </div>
       )}
 
-      {/* 💰 Checkout / Payment */}
+      {/* 💰 Checkout */}
       {stage === "checkout" && (
         <div className="flex flex-col items-center justify-center min-h-screen">
           <h2 className="text-2xl mb-4">Get Premium</h2>
