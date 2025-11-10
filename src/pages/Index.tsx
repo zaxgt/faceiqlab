@@ -12,10 +12,29 @@ const Index = () => {
   const [visits, setVisits] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch("https://api.countapi.xyz/hit/facelabs.netlify.app/visits")
+    const domain = encodeURIComponent(window.location.hostname);
+
+    // Record the visit and fetch current total
+    fetch("https://visitor.6developer.com/visit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        domain,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        page_path: window.location.pathname,
+        page_title: document.title,
+        referrer: document.referrer,
+      }),
+    })
       .then((res) => res.json())
-      .then((data) => setVisits(data.value))
-      .catch(() => setVisits(0));
+      .then((data) => {
+        // data.totalCount is the current visitor count
+        setVisits(data.totalCount);
+      })
+      .catch((err) => {
+        console.error("Visitor counter error:", err);
+        setVisits(0);
+      });
   }, []);
 
   const handleBegin = () => setStage("upload");
