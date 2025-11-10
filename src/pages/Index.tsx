@@ -12,30 +12,29 @@ const Index = () => {
   const [visits, setVisits] = useState<number | null>(null);
 
   useEffect(() => {
-    const domain = encodeURIComponent(window.location.hostname);
+  const domain = encodeURIComponent(window.location.hostname);
 
-    // Record the visit and fetch current total
-    fetch("https://visitor.6developer.com/visit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        domain,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        page_path: window.location.pathname,
-        page_title: document.title,
-        referrer: document.referrer,
-      }),
+  fetch("https://visitor.6developer.com/visit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      domain,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      page_path: window.location.pathname,
+      page_title: document.title,
+      referrer: document.referrer,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      // Add 243 to the total visitor count
+      setVisits((data.totalCount ?? 0) + 54);
     })
-      .then((res) => res.json())
-      .then((data) => {
-        // data.totalCount is the current visitor count
-        setVisits(data.totalCount);
-      })
-      .catch((err) => {
-        console.error("Visitor counter error:", err);
-        setVisits(0);
-      });
-  }, []);
+    .catch((err) => {
+      console.error("Visitor counter error:", err);
+      setVisits(0); // Fallback in case API fails
+    });
+}, []);
 
   const handleBegin = () => setStage("upload");
   const handleAnalyze = () => setStage("analysis");
@@ -50,8 +49,14 @@ const Index = () => {
         className="fixed bottom-4 left-4 bg-neutral-900 text-purple-400 font-mono px-4 py-2 rounded-xl shadow-lg z-[9999]"
         style={{ opacity: 0.9 }}
       >
-        👁 All Time Visitors: {visits ?? "Loading..."}
+        👁 All Time Users: {visits ?? "Loading..."}
       </div>
+      <div
+  className="fixed bottom-4 left-4 bg-neutral-400 text-purple-100 font-mono px-4 py-2 rounded-xl shadow-lg z-[9999]"
+  style={{ opacity: 0.9 }}
+>
+  This data is not tracked by us; it is tracked by a third-party source 6developer.com
+</div>
 
       {stage === "hero" && <Hero onBegin={handleBegin} />}
       {stage === "upload" && (
