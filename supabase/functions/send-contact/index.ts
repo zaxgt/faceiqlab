@@ -19,26 +19,30 @@ serve(async (req) => {
       throw new Error("DISCORD_WEBHOOK_URL is not configured");
     }
 
+    const fields = [
+      {
+        name: "User Rating",
+        value: rating || "N/A",
+        inline: true
+      }
+    ];
+
+    // Add note if image was included (but don't send the large base64)
+    if (frontImage) {
+      fields.push({
+        name: "Image",
+        value: "✅ Front face image included",
+        inline: true
+      });
+    }
+
     const embed: any = {
       title: "📬 New Contact Message",
       description: message,
       color: 0x00ffff,
-      fields: [
-        {
-          name: "User Rating",
-          value: rating || "N/A",
-          inline: true
-        }
-      ],
+      fields: fields,
       timestamp: new Date().toISOString()
     };
-
-    // Add image if provided
-    if (frontImage) {
-      embed.image = {
-        url: frontImage
-      };
-    }
 
     const discordPayload = {
       embeds: [embed]
