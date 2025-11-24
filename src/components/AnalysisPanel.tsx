@@ -313,7 +313,8 @@ const AnalysisPanel = ({
       const { data, error } = await supabase.functions.invoke('send-contact', {
         body: {
           message: contactMessage,
-          rating: overallScore
+          rating: overallScore,
+          frontImage: frontImage
         }
       });
       
