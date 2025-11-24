@@ -2,9 +2,11 @@ import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 interface HeroProps {
   onBegin: () => void;
+  onPremium: () => void;
 }
 const Hero = ({
-  onBegin
+  onBegin,
+  onPremium
 }: HeroProps) => {
   return <div className="relative min-h-screen flex flex-col items-center justify-center px-4">
       {/* Animated background glow lines */}
@@ -25,11 +27,21 @@ const Hero = ({
           Where symmetry meets soul.
         </p>
         
-        <div className="pt-8">
+        <div className="pt-8 flex flex-col items-center gap-4">
           <Button onClick={onBegin} className="group relative px-8 py-6 text-lg font-semibold bg-card border border-cyan/30 text-foreground hover:border-cyan hover:glow-cyan transition-all duration-300">
             Begin Analysis
             <ChevronDown className="ml-2 h-5 w-5 animate-pulse-glow" />
           </Button>
+          
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-muted-foreground text-sm">Premium — $1 / week</p>
+            <Button 
+              onClick={onPremium}
+              className="px-6 py-3 bg-gradient-to-r from-magenta to-purple-600 text-white hover:from-magenta/90 hover:to-purple-600/90 transition-all duration-300 font-semibold"
+            >
+              Get Premium
+            </Button>
+          </div>
         </div>
       </div>
 
