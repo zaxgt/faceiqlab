@@ -1,19 +1,22 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Hero from "@/components/Hero";
 import UploadSection from "@/components/UploadSection";
 import AnalysisPanel from "@/components/AnalysisPanel";
+import { supabase } from "@/integrations/supabase/client";
+import type { User, Session } from "@supabase/supabase-js";
 
 const Index = () => {
-  const [stage, setStage] = useState<"hero" | "upload" | "analysis" | "signin" | "checkout" | "dashboard">("hero");
+  const navigate = useNavigate();
+  const [stage, setStage] = useState<"hero" | "upload" | "analysis">("hero");
   const [frontImage, setFrontImage] = useState<string | null>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isPremium, setIsPremium] = useState(false);
 
   // 👁 Visitor counter state
   const [visits, setVisits] = useState<number | null>(null);
-
-  // 🔐 User and Premium states
-  const [user, setUser] = useState<string | null>(localStorage.getItem("user"));
-  const [premium, setPremium] = useState<boolean>(localStorage.getItem("premium") === "true");
 
   useEffect(() => {
     const domain = encodeURIComponent(window.location.hostname);
@@ -39,40 +42,69 @@ const Index = () => {
       });
   }, []);
 
-  const handleBegin = () => setStage("upload");
-  const handleAnalyze = () => setStage("analysis");
+  // Auth state management
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        // Fetch premium status when user logs in
+        if (session?.user) {
+          setTimeout(() => {
+            fetchPremiumStatus(session.user.id);
+          }, 0);
+        } else {
+          setIsPremium(false);
+        }
+      }
+    );
 
-  // 🪙 Premium button logic
-  const handlePremiumClick = () => {
-    if (!user) {
-      setStage("signin");
-    } else if (!premium) {
-      setStage("checkout");
-    } else {
-      setStage("dashboard");
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        fetchPremiumStatus(session.user.id);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchPremiumStatus = async (userId: string) => {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("premium")
+      .eq("id", userId)
+      .single();
+
+    if (profile) {
+      setIsPremium(profile.premium);
     }
   };
 
-  // 🔑 Sign in handler
-  const handleSignIn = (username: string) => {
-    localStorage.setItem("user", username);
-    setUser(username);
-    setStage("checkout");
+  const handleBegin = () => setStage("upload");
+  const handleAnalyze = () => setStage("analysis");
+
+  const handlePremiumClick = () => {
+    if (!user) {
+      navigate("/auth");
+    } else if (!isPremium) {
+      navigate("/premium");
+    } else {
+      // Already premium, go to upload
+      setStage("upload");
+    }
   };
 
-  // 💰 Simulate payment
-  const handlePayment = () => {
-    localStorage.setItem("premium", "true");
-    setPremium(true);
-    setStage("dashboard");
-  };
-
-  // 📊 Sign out
-  const handleSignOut = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("premium");
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    setPremium(false);
+    setSession(null);
+    setIsPremium(false);
     setStage("hero");
   };
 
@@ -94,6 +126,23 @@ const Index = () => {
         </div>
       </div>
 
+      {/* User menu if logged in */}
+      {user && stage === "hero" && (
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-4">
+          {isPremium && (
+            <span className="bg-gradient-to-r from-magenta to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+              Premium Member
+            </span>
+          )}
+          <button
+            onClick={handleSignOut}
+            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+          >
+            Sign Out
+          </button>
+        </div>
+      )}
+
       {/* 🧠 Stage Rendering */}
       {stage === "hero" && (
         <Hero onBegin={handleBegin} onPremium={handlePremiumClick} />
@@ -111,69 +160,6 @@ const Index = () => {
 
       {stage === "analysis" && (
         <AnalysisPanel profileImage={profileImage} frontImage={frontImage} />
-      )}
-
-      {/* 🔑 Sign-in screen */}
-      {stage === "signin" && (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <h2 className="text-2xl mb-4">Sign In</h2>
-          <input
-            id="username"
-            className="border border-gray-700 bg-neutral-900 px-4 py-2 rounded-md mb-4"
-            placeholder="Enter your username"
-          />
-          <button
-            onClick={() => {
-              const input = document.getElementById("username") as HTMLInputElement;
-              if (input.value) handleSignIn(input.value);
-            }}
-            className="px-4 py-2 bg-purple-500 hover:bg-purple-600 rounded-lg"
-          >
-            Continue
-          </button>
-          <button onClick={() => setStage("hero")} className="mt-3 text-sm text-gray-400">
-            Cancel
-          </button>
-        </div>
-      )}
-
-      {/* 💰 Checkout / Payment */}
-      {stage === "checkout" && (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <h2 className="text-2xl mb-4">Get Premium</h2>
-          <p className="text-gray-400 mb-6">Pay $1/week using PayPal or Swish</p>
-          <button
-            onClick={handlePayment}
-            className="px-5 py-2 bg-green-600 hover:bg-green-700 rounded-lg"
-          >
-            Simulate Payment
-          </button>
-          <button onClick={() => setStage("hero")} className="mt-3 text-sm text-gray-400">
-            Cancel
-          </button>
-        </div>
-      )}
-
-      {/* 📊 Dashboard */}
-      {stage === "dashboard" && (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <h2 className="text-3xl mb-4">Dashboard</h2>
-          <p className="text-gray-400 mb-6">
-            Welcome, {user}! You have Premium access.
-          </p>
-          <button
-            onClick={() => setStage("upload")}
-            className="px-5 py-2 bg-purple-500 hover:bg-purple-600 rounded-lg mb-4"
-          >
-            Analyze Face
-          </button>
-          <button
-            onClick={handleSignOut}
-            className="text-sm text-gray-400 hover:text-gray-200"
-          >
-            Sign out
-          </button>
-        </div>
       )}
     </div>
   );
