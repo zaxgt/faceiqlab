@@ -96,18 +96,7 @@ const Index = () => {
 
       {/* 🧠 Stage Rendering */}
       {stage === "hero" && (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <Hero onBegin={handleBegin} />
-          <div className="mt-6 flex flex-col items-center">
-            <p className="text-gray-400 text-sm">Premium — $1 / week</p>
-            <button
-              onClick={handlePremiumClick}
-              className="mt-2 px-5 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 transition"
-            >
-              Premium
-            </button>
-          </div>
-        </div>
+        <Hero onBegin={handleBegin} onPremium={handlePremiumClick} />
       )}
 
       {stage === "upload" && (
