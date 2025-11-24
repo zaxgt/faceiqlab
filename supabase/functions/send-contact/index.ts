@@ -12,27 +12,36 @@ serve(async (req) => {
   }
 
   try {
-    const { message, rating } = await req.json();
+    const { message, rating, frontImage } = await req.json();
     const DISCORD_WEBHOOK_URL = Deno.env.get("DISCORD_WEBHOOK_URL");
 
     if (!DISCORD_WEBHOOK_URL) {
       throw new Error("DISCORD_WEBHOOK_URL is not configured");
     }
 
+    const embed: any = {
+      title: "📬 New Contact Message",
+      description: message,
+      color: 0x00ffff,
+      fields: [
+        {
+          name: "User Rating",
+          value: rating || "N/A",
+          inline: true
+        }
+      ],
+      timestamp: new Date().toISOString()
+    };
+
+    // Add image if provided
+    if (frontImage) {
+      embed.image = {
+        url: frontImage
+      };
+    }
+
     const discordPayload = {
-      embeds: [{
-        title: "📬 New Contact Message",
-        description: message,
-        color: 0x00ffff,
-        fields: [
-          {
-            name: "User Rating",
-            value: rating || "N/A",
-            inline: true
-          }
-        ],
-        timestamp: new Date().toISOString()
-      }]
+      embeds: [embed]
     };
 
     const response = await fetch(DISCORD_WEBHOOK_URL, {

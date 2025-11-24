@@ -32,10 +32,14 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
   // Front image: things visible from the front
   // Profile image: things visible from the side (angles, projections, convexity)
   const useFrontImage = [
-    "cantalTilt", "eyebrowTilt", "yawSymmetry", 
+    "interpupillaryDistance", "intercanthalDistance", "biocularWidth", "canthalIndex",
+    "palpebralFissureLength", "cantalTilt", "eyebrowTilt", "yawSymmetry", 
     "nasalHeightToWidthRatio", "topThird", "middleThird", "lowerThird", "noseToMouthRatio",
     "totalFacialWidthToHeightRatio", "bigonialToBizygomaticRatio", "eyeSeparationRatio",
-    "eyesApartRatio", "faceWidthToHeightRatio", "chinToPhiltrumRatio"
+    "eyesApartRatio", "faceWidthToHeightRatio", "chinToPhiltrumRatio",
+    "midfaceRatio", "lowerThirdToMidfaceRatio", "facialWidthToHeightRatio",
+    "jawToCheekboneRatio", "templeToJawRatio", "mouthToNoseWidthRatio",
+    "nasalIndexRatio", "lipThicknessRatio"
   ].includes(metric.key);
   
   const useProfileImage = [
@@ -44,8 +48,8 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
     "totalFacialConvexity"
   ].includes(metric.key);
   
-  const displayImage = useProfileImage ? profileImage : useFrontImage ? frontImage : null;
-  const imageLandmarks = useProfileImage ? landmarks?.profile : useFrontImage ? landmarks?.front : null;
+  const displayImage = useProfileImage ? profileImage : (useFrontImage || !useProfileImage) ? frontImage : null;
+  const imageLandmarks = useProfileImage ? landmarks?.profile : landmarks?.front;
 
   // Calculate zoom region based on metric type
   const getZoomStyle = () => {
