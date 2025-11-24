@@ -985,16 +985,16 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-cyan">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-background border-cyan/50">
         <DialogHeader>
-          <DialogTitle className="text-2xl text-cyan">{metric.title}</DialogTitle>
+          <DialogTitle className="text-3xl text-cyan font-bold">{metric.title}</DialogTitle>
         </DialogHeader>
 
-        <div className="grid md:grid-cols-2 gap-6 mt-4">
+        <div className="grid md:grid-cols-[1fr,1.2fr] gap-8 mt-6">
           {/* Left side - Image with measurement lines */}
           <div className="space-y-4">
-            <div className="bg-background/50 p-4 rounded-lg border border-cyan/30 overflow-hidden">
-              <div className="relative w-full mx-auto rounded-lg overflow-hidden h-[400px] bg-black/10">
+            <div className="bg-black/40 p-2 rounded-lg border border-cyan/30 overflow-hidden">
+              <div className="relative w-full mx-auto rounded overflow-hidden h-[500px] bg-black/20">
                 {displayImage && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="relative w-full h-full transition-transform duration-300" style={getZoomStyle()}>
@@ -1016,61 +1016,63 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
           {/* Right side - Score information */}
           <div className="space-y-6">
             {/* Score bar with gradient */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Target range</span>
-                <span className="text-muted-foreground">Normalized score (1-10)</span>
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>Target range</span>
+                <span>Normalized score (1-10)</span>
               </div>
               
-              <div className="text-center text-2xl font-bold text-foreground mb-2">
+              <div className="text-center text-3xl font-bold text-foreground mb-3">
                 {metric.value}
               </div>
               
-              <div className="relative h-12 rounded-full overflow-hidden"
+              <div className="relative h-14 rounded-lg overflow-hidden shadow-lg"
                 style={{
-                  background: 'linear-gradient(to right, #00ff00, #00ffff, #ff8800, #ff0000)'
+                  background: 'linear-gradient(to right, #00ff88 0%, #00d4ff 33%, #ffaa00 66%, #ff0044 100%)'
                 }}
               >
                 {/* Score marker */}
                 <div 
-                  className="absolute top-0 bottom-0 w-1 bg-white shadow-lg"
+                  className="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)]"
                   style={{ left: `${scorePosition}%` }}
                 >
-                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rounded-full border-2 border-background shadow-lg" />
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-5 h-5 bg-white rounded-full border-4 border-background shadow-lg" />
                 </div>
               </div>
               
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Ideal: {metric.ideal}</span>
-                <span>Max: 43.00 %</span>
+                <span>Max: {metric.score.toFixed(2)} / 10</span>
               </div>
             </div>
 
             {/* Your Assessment */}
-            <div className="bg-background/50 p-4 rounded-lg border border-border">
-              <h3 className="text-sm font-semibold text-cyan mb-2">YOUR ASSESSMENT</h3>
-              <p className="text-lg font-medium text-foreground">{getAssessment(metric.score)}</p>
+            <div className="bg-black/40 p-5 rounded-lg border border-cyan/20">
+              <h3 className="text-sm font-bold text-cyan mb-2 tracking-wide">YOUR ASSESSMENT</h3>
+              <p className="text-xl font-semibold text-foreground">{getAssessment(metric.score)}</p>
             </div>
 
             {/* About this ratio */}
-            <div className="bg-background/50 p-4 rounded-lg border border-border">
-              <h3 className="text-sm font-semibold text-cyan mb-2">ABOUT THIS RATIO</h3>
+            <div className="bg-black/40 p-5 rounded-lg border border-cyan/20">
+              <h3 className="text-sm font-bold text-cyan mb-3 tracking-wide">ABOUT THIS RATIO</h3>
               <p className="text-sm text-foreground leading-relaxed">{metric.description}</p>
             </div>
 
             {/* Score Distribution */}
-            <div className="bg-background/50 p-4 rounded-lg border border-border">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-sm font-semibold text-cyan">Score Distribution</h3>
-                <div className="text-right text-xs text-muted-foreground">
-                  <div>Hover</div>
-                  <div className="text-cyan">{metric.ideal}</div>
-                </div>
+            <div className="bg-black/40 p-5 rounded-lg border border-cyan/20">
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="text-sm font-bold text-cyan tracking-wide">Score Distribution</h3>
+                {hoverPoint && (
+                  <div className="text-right text-xs">
+                    <div className="text-muted-foreground">Hover</div>
+                    <div className="text-cyan font-semibold">{hoverPoint.value}</div>
+                  </div>
+                )}
               </div>
               <p className="text-xs text-muted-foreground mb-4">How points are awarded across ratio values</p>
               
               {/* Distribution curve */}
-              <div className="relative h-48 bg-gradient-to-b from-background/95 to-background/80 rounded border border-border/50">
+              <div className="relative h-48 bg-black/60 rounded border border-cyan/10">
                 <svg 
                   className="w-full h-full cursor-crosshair" 
                   viewBox="0 0 100 100" 
@@ -1095,8 +1097,8 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                   {/* Gradient fill under curve */}
                   <defs>
                     <linearGradient id="curveGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
-                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.05" />
+                      <stop offset="0%" stopColor="#00d4ff" stopOpacity="0.4" />
+                      <stop offset="100%" stopColor="#00d4ff" stopOpacity="0.05" />
                     </linearGradient>
                   </defs>
                   
@@ -1114,11 +1116,11 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                         100,100
                       `}
                       fill="url(#curveGradient)"
-                      opacity="0.5"
+                      opacity="0.6"
                     />
                   )}
                   
-                  {/* Bell curve - thicker stroke */}
+                  {/* Bell curve - cyan stroke */}
                   {distributionData.length > 0 && (
                     <polyline
                       points={distributionData.map((p, i) => {
@@ -1128,31 +1130,31 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                         return `${xPos},${100 - (p.y * 10)}`;
                       }).join(' ')}
                       fill="none"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth="2"
+                      stroke="#00d4ff"
+                      strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                   )}
                   
-                  {/* User's score marker */}
+                  {/* User's score marker - green */}
                   <line
                     x1={scorePosition}
                     y1="0"
                     x2={scorePosition}
                     y2="100"
-                    stroke="hsl(var(--cyan))"
-                    strokeWidth="1"
-                    strokeDasharray="3,3"
-                    opacity="0.8"
+                    stroke="#00ff88"
+                    strokeWidth="2"
+                    strokeDasharray="4,4"
+                    opacity="0.9"
                   />
                   <circle
                     cx={scorePosition}
                     cy={100 - (metric.score * 10)}
-                    r="2"
-                    fill="hsl(var(--cyan))"
+                    r="2.5"
+                    fill="#00ff88"
                     stroke="white"
-                    strokeWidth="0.5"
+                    strokeWidth="0.8"
                   />
                   
                   {/* User value label */}
@@ -1161,7 +1163,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                     y={Math.max(5, 100 - (metric.score * 10) - 10)}
                     width="24"
                     height="8"
-                    fill="hsl(var(--cyan))"
+                    fill="#00ff88"
                     rx="2"
                     opacity="0.95"
                   />
@@ -1169,7 +1171,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                     x={Math.max(14, Math.min(87, scorePosition))}
                     y={Math.max(10, 100 - (metric.score * 10) - 6)}
                     fontSize="3.5"
-                    fill="white"
+                    fill="black"
                     textAnchor="middle"
                     dominantBaseline="middle"
                     fontWeight="bold"
@@ -1185,18 +1187,18 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                         y1="0"
                         x2={hoverPoint.x}
                         y2="100"
-                        stroke="hsl(var(--primary))"
-                        strokeWidth="0.5"
+                        stroke="#00d4ff"
+                        strokeWidth="0.8"
                         strokeDasharray="2,2"
-                        opacity="0.6"
+                        opacity="0.7"
                       />
                       <circle
                         cx={hoverPoint.x}
                         cy={hoverPoint.y}
-                        r="2"
-                        fill="hsl(var(--primary))"
+                        r="2.5"
+                        fill="#00d4ff"
                         stroke="white"
-                        strokeWidth="0.5"
+                        strokeWidth="0.8"
                       />
                       {/* Hover tooltip */}
                       <rect
@@ -1204,8 +1206,8 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                         y={Math.max(5, hoverPoint.y - 12)}
                         width="34"
                         height="10"
-                        fill="hsl(var(--background))"
-                        stroke="hsl(var(--primary))"
+                        fill="rgba(0, 0, 0, 0.9)"
+                        stroke="#00d4ff"
                         strokeWidth="0.5"
                         rx="2"
                         opacity="0.95"
@@ -1214,7 +1216,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                         x={Math.max(19, Math.min(82, hoverPoint.x))}
                         y={Math.max(10, hoverPoint.y - 7.5)}
                         fontSize="3"
-                        fill="hsl(var(--primary))"
+                        fill="#00d4ff"
                         textAnchor="middle"
                         fontWeight="bold"
                       >
@@ -1224,7 +1226,7 @@ const MetricDialog = ({ isOpen, onClose, metric, frontImage, profileImage, landm
                         x={Math.max(19, Math.min(82, hoverPoint.x))}
                         y={Math.max(13, hoverPoint.y - 4.5)}
                         fontSize="2.5"
-                        fill="hsl(var(--muted-foreground))"
+                        fill="#999"
                         textAnchor="middle"
                       >
                         {hoverPoint.score.toFixed(1)} pts
