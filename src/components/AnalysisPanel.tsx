@@ -14,68 +14,146 @@ interface AnalysisPanelProps {
   frontImage: string | null;
 }
 const metricDefinitions = [{
+  key: "interpupillaryDistance",
+  title: "Interpupillary Distance (IPD)",
+  ideal: "58-72mm",
+  color: "cyan",
+  description: "The distance between the centers of your pupils. This measurement is crucial for facial balance and eye spacing. Average adult IPD is around 63mm."
+}, {
+  key: "intercanthalDistance",
+  title: "Intercanthal Distance",
+  ideal: "28-35mm",
+  color: "magenta",
+  description: "The distance between the inner corners of your eyes. This affects the perception of eye width and facial harmony."
+}, {
+  key: "biocularWidth",
+  title: "Biocular Width",
+  ideal: "85-105mm",
+  color: "cyan",
+  description: "The distance between the outer corners of your eyes. This measurement defines the horizontal span of your eyes."
+}, {
+  key: "canthalIndex",
+  title: "Canthal Index",
+  ideal: "45-55%",
+  color: "magenta",
+  description: "Ratio of intercanthal distance to interpupillary distance. Ideal range creates balanced eye spacing and facial width."
+}, {
+  key: "palpebralFissureLength",
+  title: "Palpebral Fissure Length",
+  ideal: "8-12mm",
+  color: "cyan",
+  description: "The height of your eye opening. This measurement affects eye shape and overall eye appearance."
+}, {
+  key: "topThird",
+  title: "Top Third (Forehead)",
+  ideal: "25-30%",
+  color: "magenta",
+  description: "The top third measures your forehead height as a percentage of total face height. Ideally this should be around 25-30% for balanced facial proportions."
+}, {
+  key: "middleThird",
+  title: "Middle Third (Midface)",
+  ideal: "25-30%",
+  color: "cyan",
+  description: "The middle third measures from eyebrow line to nose bottom. This should be around 25-30% of your total face height for ideal harmony."
+}, {
+  key: "lowerThird",
+  title: "Lower Third Proportion",
+  ideal: "30-40%",
+  color: "magenta",
+  description: "The lower third measures from nose bottom to chin. Balanced proportion creates strong, harmonious lower face structure."
+}, {
+  key: "midfaceRatio",
+  title: "Midface Ratio",
+  ideal: "30-35%",
+  color: "cyan",
+  description: "The proportion of the midface relative to total facial height. Balanced midface creates youthful, attractive proportions."
+}, {
+  key: "lowerThirdToMidfaceRatio",
+  title: "Lower Third to Midface Ratio",
+  ideal: "0.95-1.05×",
+  color: "magenta",
+  description: "Compares lower third height to midface height. Balanced ratio creates harmonious vertical facial proportions."
+}, {
   key: "totalFacialWidthToHeightRatio",
   title: "Total Facial Width to Height Ratio",
   ideal: "1.12-1.57×",
   color: "cyan",
   description: "This ratio compares the widest part of your face to its total height. A balanced ratio creates optimal facial proportions."
 }, {
-  key: "bigonialToBizygomaticRatio",
-  title: "Bigonial to Bizygomatic Width Ratio",
-  ideal: "66.40-109.60%",
+  key: "facialWidthToHeightRatio",
+  title: "Facial Width to Height Ratio (FWHR)",
+  ideal: "1.75-1.95×",
   color: "magenta",
-  description: "This compares jaw width to cheekbone width. The ratio determines facial structure and shape definition."
+  description: "Key attractiveness metric comparing cheekbone width to face height. Higher values suggest stronger, more dominant facial structure."
 }, {
-  key: "lowerThird",
-  title: "Lower Third Proportion",
-  ideal: "30-40%",
+  key: "bigonialToBizygomaticRatio",
+  title: "Bigonial to Bizygomatic Ratio",
+  ideal: "70-85%",
   color: "cyan",
-  description: "The lower third measures from nose bottom to chin. Balanced proportion creates strong, harmonious lower face structure."
+  description: "This compares jaw width to cheekbone width. Lower percentages create more V-shaped, tapered facial structure."
 }, {
-  key: "eyesApartRatio",
-  title: "Eyes Apart",
-  ideal: "0.65-1.26×",
+  key: "jawToCheekboneRatio",
+  title: "Jaw to Cheekbone Ratio",
+  ideal: "0.75-0.90×",
+  color: "magenta",
+  description: "Compares jaw width to cheekbone width. Lower ratios indicate stronger facial tapering and definition."
+}, {
+  key: "templeToJawRatio",
+  title: "Temple to Jaw Ratio",
+  ideal: "0.85-1.05×",
   color: "cyan",
-  description: "This ratio measures eye spacing relative to facial features. Balanced spacing enhances facial attractiveness."
+  description: "Compares temple width to jaw width. Balanced ratio creates harmonious facial tapering from top to bottom."
+}, {
+  key: "eyeSeparationRatio",
+  title: "Eye Separation Ratio",
+  ideal: "40-50%",
+  color: "magenta",
+  description: "Inner eye distance as percentage of face width. Optimal ratio creates balanced eye positioning."
 }, {
   key: "noseToMouthRatio",
-  title: "Mouth to Nose",
+  title: "Nose to Mouth Width Ratio",
   ideal: "1.20-1.35×",
-  color: "magenta",
+  color: "cyan",
   description: "This ratio compares mouth width to nose width. Optimal ratio creates balanced mid-to-lower face proportions."
 }, {
-  key: "faceWidthToHeightRatio",
-  title: "Face Width to Height Ratio",
-  ideal: "1.58-2.36×",
+  key: "mouthToNoseWidthRatio",
+  title: "Mouth to Nose Width Ratio (Outer)",
+  ideal: "1.40-1.60×",
+  color: "magenta",
+  description: "Compares outer mouth width to nose width. Proper ratio enhances lower face aesthetics and smile width."
+}, {
+  key: "nasalHeightToWidthRatio",
+  title: "Nasal Height to Width Ratio",
+  ideal: "1.00-1.20×",
   color: "cyan",
-  description: "This measures face width at eye level to forehead height. Balanced ratio defines overall facial shape and structure."
+  description: "Defines nose balance from front view. Your ratio shows well-proportioned nasal dimensions."
+}, {
+  key: "nasalIndexRatio",
+  title: "Nasal Index",
+  ideal: "60-85%",
+  color: "magenta",
+  description: "Nose width as percentage of nose height. Indicates nasal shape classification and proportionality."
+}, {
+  key: "lipThicknessRatio",
+  title: "Lip Thickness Ratio",
+  ideal: "0.80-1.20×",
+  color: "cyan",
+  description: "Ratio of upper lip to lower lip thickness. Balanced ratio creates harmonious mouth appearance."
 }, {
   key: "chinToPhiltrumRatio",
-  title: "Chin to Philtrum",
-  ideal: "0.80-3.80×",
+  title: "Chin to Philtrum Ratio",
+  ideal: "1.80-2.20×",
   color: "magenta",
-  description: "This compares chin height to philtrum height. Proper ratio creates balanced lower third proportions."
-}, {
-  key: "topThird",
-  title: "Top Third (Forehead)",
-  ideal: "25-30%",
-  color: "cyan",
-  description: "The top third measures your forehead height as a percentage of total face height. Ideally this should be around 25-30% for balanced facial proportions."
-}, {
-  key: "middleThird",
-  title: "Middle Third (Midface)",
-  ideal: "25-30%",
-  color: "magenta",
-  description: "The middle third measures from eyebrow line to nose bottom. This should be around 25-30% of your total face height for ideal harmony."
+  description: "Compares chin height to philtrum height. Proper ratio creates balanced lower third proportions and strong chin definition."
 }, {
   key: "gonialAngle",
-  title: "Gonial Angle",
+  title: "Gonial Angle (Jaw Angle)",
   ideal: "120-130°",
   color: "cyan",
-  description: "The gonial angle defines your jawline sharpness. Angles within 120-130° create the most defined, masculine jaw structure."
+  description: "The gonial angle defines your jawline sharpness. Angles within 120-130° create the most defined, angular jaw structure."
 }, {
   key: "cantalTilt",
-  title: "Cantal Tilt",
+  title: "Canthal Tilt",
   ideal: "5-8°",
   color: "magenta",
   description: "Cantal tilt is the angle of your outer eye corners. A positive tilt of 5-8° creates the most attractive, youthful eye shape."
@@ -83,13 +161,13 @@ const metricDefinitions = [{
   key: "eyebrowTilt",
   title: "Eyebrow Tilt",
   ideal: "2-5°",
-  color: "magenta",
+  color: "cyan",
   description: "Eyebrow angle defines facial expression and frame. Your tilt is well-positioned within the ideal expressive range."
 }, {
   key: "yawSymmetry",
   title: "Yaw Symmetry",
   ideal: "95-100%",
-  color: "cyan",
+  color: "magenta",
   description: "Yaw symmetry measures how centered and balanced your face appears. Higher percentages indicate exceptional facial alignment."
 }, {
   key: "nasalProjection",
@@ -128,11 +206,11 @@ const metricDefinitions = [{
   color: "magenta",
   description: "Overall facial profile curvature. Your measurement demonstrates strong dimensional proportionality."
 }, {
-  key: "nasalHeightToWidthRatio",
-  title: "Nasal Height-to-Width Ratio",
-  ideal: "1.00-1.20",
-  color: "magenta",
-  description: "Defines nose balance from front view. Your ratio shows well-proportioned nasal dimensions."
+  key: "faceWidthToHeightRatio",
+  title: "Face Width to Height at Eye Level",
+  ideal: "1.58-2.36×",
+  color: "cyan",
+  description: "This measures face width at eye level to forehead height. Balanced ratio defines overall facial shape and structure."
 }];
 const AnalysisPanel = ({
   profileImage,
